@@ -73,3 +73,8 @@ Ingredient_IngredientTag_Map
 -
 IngredientID string FK >- Ingredient.IngredientID
 IngredientTagID string FK >- IngredientTag.IngredientTagID
+
+User_Following_Map
+-
+UserID TEXT
+TargetID TEXT
