@@ -3,6 +3,8 @@ This file contains toplevel functions that are used throughout the program
 but don't belong to any one class in particular.
 '''
 import datetime
+import os
+import unicodedata
 
 from . import constants
 from . import exceptions
@@ -36,3 +38,71 @@ def read_filebytes(filepath, range_min, range_max, chunk_size=2 ** 20):
 
             yield chunk
             sent_amount += len(chunk)
+
+def recursive_dict_update(d1, d2):
+    '''
+    Update d1 using d2, but when the value is a dictionary update the insides
+    instead of replacing the dictionary itself.
+    '''
+    for (key, value) in d2.items():
+        if isinstance(value, dict):
+            existing = d1.get(key, None)
+            if existing is None:
+                d1[key] = value
+            else:
+                recursive_dict_update(existing, value)
+        else:
+            d1[key] = value
+
+def recursive_dict_keys(d):
+    '''
+    Given a dictionary, return a set containing all of its keys and the keys of
+    all other dictionaries that appear as values within. The subkeys will use \\
+    to indicate their lineage.
+
+    {
+        'hi': {
+            'ho': 'neighbor'
+        }
+    }
+
+    returns
+
+    {'hi', 'hi\\ho'}
+    '''
+    keys = set(d.keys())
+    for (key, value) in d.items():
+        if isinstance(value, dict):
+            subkeys = {'%s\\%s' % (key, subkey) for subkey in recursive_dict_keys(value)}
+            keys.update(subkeys)
+    return keys
+
+def remove_characters(text, characters):
+    translator = {ord(c): None for c in characters}
+    text = text.translate(translator)
+    return text
+
+def remove_control_characters(text):
+    '''
+    Thanks Alex Quinn
+    https://stackoverflow.com/a/19016117
+
+    unicodedata.category(character) returns some two-character string
+    where if [0] is a C then the character is a control character.
+    '''
+    return ''.join(c for c in text if unicodedata.category(c)[0] != 'C')
+
+def remove_path_badchars(filepath, allowed=''):
+    '''
+    Remove the bad characters seen in constants.FILENAME_BADCHARS, except
+    those which you explicitly permit.
+
+    'file*name' -> 'filename'
+    ('D:\\file*name', allowed=':\\') -> 'D:\\filename'
+    '''
+    badchars = remove_characters(constants.FILENAME_BADCHARS, allowed)
+    filepath = remove_characters(filepath, badchars)
+
+    filepath = filepath.replace('/', os.sep)
+    filepath = filepath.replace('\\', os.sep)
+    return filepath

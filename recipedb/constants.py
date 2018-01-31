@@ -5,6 +5,9 @@ the entire program.
 This file should not import any other file in the same package.
 '''
 
+import logging
+
+
 FILENAME_BADCHARS = '\\/:*?<>|"'
 
 # Note: Setting user_version pragma in init sequence is safe because it only
@@ -51,3 +54,12 @@ SQL_USER_COLUMNS = _extract_column_names('User')
 
 _sql_dictify = lambda columns: {key:index for (index, key) in enumerate(columns)}
 SQL_USER = _sql_dictify(SQL_USER_COLUMNS)
+
+DEFAULT_DATADIR = '.\\_recipedb'
+DEFAULT_DBNAME = 'recipe.db'
+DEFAULT_CONFIGNAME = 'config.json'
+DEFAULT_IMAGEDIR = 'images'
+
+DEFAULT_CONFIGURATION = {
+    'log_level': logging.DEBUG,
+}
