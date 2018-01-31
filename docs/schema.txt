@@ -1,0 +1,75 @@
+User
+-
+UserID string PK
+Username string
+DisplayName string
+BioText string
+DateJoined int
+PasswordHash binary
+ProfileImageID string FK >- Image.ImageID
+
+UserSettings
+-
+UserID string FK >- User.UserID
+SettingName string
+SettingValue string
+
+Recipe
+-
+RecipeID string PK
+Name string
+AuthorID string FK >- User.UserID
+CountryOfOrigin string
+MealType string
+Cuisine string
+PrepTime int
+DateAdded int
+DateModified int
+Blurb string
+ServingSize int
+Instructions string
+
+Image
+-
+ImageID string PK
+ImageFilePath string
+
+Review
+-
+ReviewID string PK
+AuthorID string FK >- User.UserID
+RecipeID string FK >- Recipe.RecipeID
+Score int
+Text string
+
+Ingredient
+-
+IngredientID string PK
+Name string
+
+IngredientTag
+-
+IngredientTagID string PK
+TagName string
+ParentTagID string
+
+IngredientAutocorrect
+-
+IngredientID string FK >- Ingredient.IngredientID
+AlternateName string
+
+Image_Recipe_Map
+-
+RecipeID string FK >- Recipe.RecipeID
+ImageID string FK >- Image.ImageID
+
+Recipe_Ingredient_Map
+-
+RecipeID string FK >- Recipe.RecipeID
+IngredientID string FK >- Ingredient.IngredientID
+IngredientQuantity string
+
+Ingredient_IngredientTag_Map
+-
+IngredientID string FK >- Ingredient.IngredientID
+IngredientTagID string FK >- IngredientTag.IngredientTagID
