@@ -1,0 +1,4 @@
+bcrypt
+flask
+gevent
+voussoirkit>=0.0.19
