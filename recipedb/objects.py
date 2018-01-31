@@ -36,4 +36,14 @@ class Review(ObjectBase):
     pass
 
 class User(ObjectBase):
-    pass
+    def __init__(self, recipedb, db_row):
+        super().__init__(recipedb)
+        if isinstance(db_row, (list, tuple)):
+            db_row = dict(zip(constants.SQL_USER_COLUMNS, db_row))
+
+        self.id = db_row['UserID']
+        self.username = db_row['Username']
+        self.display_name = db_row['DisplayName']
+        self.bio_text = db_row['BioText']
+        self.date_joined = db_row['DateJoined']
+        self.profile_image_id = db_row['ProfileImageID']
