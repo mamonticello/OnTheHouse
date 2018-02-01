@@ -67,7 +67,23 @@ CREATE TABLE IF NOT EXISTS Recipe_Ingredient_Map(
     IngredientID TEXT,
     IngredientQuantity TEXT,
     FOREIGN KEY(RecipeID) REFERENCES Recipe(RecipeID),
-    FOREIGN KEY(IngredientID) REFERENCE Ingredient(IngredientID)
+    FOREIGN KEY(IngredientID) REFERENCES Ingredient(IngredientID)
+);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS Review(
+    ReviewID TEXT PRIMARY KEY,
+    AuthorID TEXT,
+    RecipeID TEXT,
+    Score INT,
+    Text TEXT,
+    FOREIGN KEY(AuthorID) REFERENCES User(UserID),
+    FOREIGN KEY(RecipeID) REFERENCES Recipe(RecipeID)
+);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS IngredientTag(
+    IngredientTagID TEXT PRIMARY KEY,
+    TagName TEXT,
+    ParentTagID TEXT
 );
 ----------------------------------------------------------------------------------------------------
 
