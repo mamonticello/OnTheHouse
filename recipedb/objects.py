@@ -21,19 +21,63 @@ class ObjectBase:
 
 
 class Image(ObjectBase):
-    pass
+    def __init__(self, recipedb, db_row):
+        super().__init__(recipedb)
+        if isinstance(db_row, (list, tuple)):
+            db_row = dict(zip(constants.SQL_USER_COLUMNS, db_row))
+
+        self.id = db_row['ImageID']
+        self.file_path = db_row['ImageFilePath']
 
 class Ingredient(ObjectBase):
-    pass
+    def __init__(self, recipedb, db_row):
+        super().__init__(recipedb)
+        if isinstance(db_row, (list, tuple)):
+            db_row = dict(zip(constants.SQL_USER_COLUMNS, db_row))
+
+        self.id = db_row['IngredientID']
+        self.name = db_row['Name']
 
 class IngredientTag(ObjectBase):
-    pass
+    def __init__(self, recipedb, db_row):
+        super().__init__(recipedb)
+        if isinstance(db_row, (list, tuple)):
+            db_row = dict(zip(constants.SQL_USER_COLUMNS, db_row))
+
+        self.id = db_row['IngredientTagID']
+        self.name = db_row['TagName']
+        self.parent_id = db_row['ParentTagID']
 
 class Recipe(ObjectBase):
-    pass
+    def __init__(self, recipedb, db_row):
+        super().__init__(recipedb)
+        if isinstance(db_row, (list, tuple)):
+            db_row = dict(zip(constants.SQL_USER_COLUMNS, db_row))
+
+        self.id = db_row['RecipeID']
+        self.name = db_row['Name']
+        self.author_id = db_row['AuthorID']
+        self.country = db_row['CountryOfOrigin']
+        self.meal_type = db_row['MealType']
+        self.cuisine = db_row['Cuisine']
+        self.prep_time = db_row['PrepTime']
+        self.date_added = db_row['DateAdded']
+        self.date_mod = db_row['DateModified']
+        self.blurb = db_row['Blurb']
+        self.serving_size = db_row['ServingSize']
+        self.instructions = db_row['Instructions']
 
 class Review(ObjectBase):
-    pass
+    def __init__(self, recipedb, db_row):
+        super().__init__(recipedb)
+        if isinstance(db_row, (list, tuple)):
+            db_row = dict(zip(constants.SQL_USER_COLUMNS, db_row))
+
+        self.id = db_row['ReviewID']
+        self.author_id = db_row['AuthorID']
+        self.recipe_id = db_row['RecipeID']
+        self.score = db_row['Score']
+        self.text = db_row['Text']
 
 class User(ObjectBase):
     def __init__(self, recipedb, db_row):
