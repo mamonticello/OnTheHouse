@@ -39,6 +39,22 @@ CREATE TABLE IF NOT EXISTS User(
 CREATE INDEX IF NOT EXISTS index_User_UserID on User(UserID);
 CREATE INDEX IF NOT EXISTS index_User_Username on User(Username COLLATE NOCASE);
 ----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS Recipe(
+    RecipeID TEXT PRIMARY KEY,
+    Name TEXT,
+    AuthorID TEXT,
+    CountryOfOrigin TEXT,
+    MealType TEXT,
+    Cuisine TEXT,
+    PrepTime INT,
+    DateAdded INT,
+    DateModified INT,
+    Blurb TEXT,
+    ServingSize INT,
+    Instructions TEXT,
+    FOREIGN KEY(AuthorID) REFERENCES User(UserID)
+);
+
 '''.format(user_version=DATABASE_VERSION)
 
 def _extract_column_names(table):
