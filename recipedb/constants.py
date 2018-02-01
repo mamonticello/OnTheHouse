@@ -54,6 +54,21 @@ CREATE TABLE IF NOT EXISTS Recipe(
     Instructions TEXT,
     FOREIGN KEY(AuthorID) REFERENCES User(UserID)
 );
+CREATE INDEX IF NOT EXISTS index_Recipe_RecipeID on Recipe(RecipeID);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS Ingredient(
+    IngredientID TEXT PRIMARY KEY,
+    Name TEXT
+);
+CREATE INDEX IF NOT EXISTS index_Ingredient_IngredientID on Ingredient(IngredientID);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS Recipe_Ingredient_Map(
+    RecipeID TEXT,
+    IngredientID TEXT,
+    IngredientQuantity TEXT,
+    FOREIGN KEY(RecipeID) REFERENCES Recipe(RecipeID),
+    FOREIGN KEY(IngredientID) REFERENCE Ingredient(IngredientID)
+);
 ----------------------------------------------------------------------------------------------------
 
 '''.format(user_version=DATABASE_VERSION)
