@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS Recipe(
     Instructions TEXT,
     FOREIGN KEY(AuthorID) REFERENCES User(UserID)
 );
+----------------------------------------------------------------------------------------------------
 
 '''.format(user_version=DATABASE_VERSION)
 
