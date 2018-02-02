@@ -124,7 +124,7 @@ class RecipeDB:
         else:
             # fetch by Name
             # make sure to check the autocorrect table first.
-            cur.execute('SELECT * FROM Ingredient WHERE name = ?', [name])
+            cur.execute('SELECT * FROM Ingredient WHERE Name = ?', [name])
             ingredient_row = cur.fetchone()
             if ingredient_row is None:
                 raise ValueError(ingredient_row)
@@ -138,11 +138,11 @@ class RecipeDB:
         '''
         # SQL SELECT query and use row to construct Recipe object.
         cur = self.sql.cursor()
-        cur.execute('SELECT * FROM Recipe WHERE id=?', [id])
+        cur.execute('SELECT * FROM Recipe WHERE RecipeID =?', [id])
         recipe_row = cur.fetchone()
         recipe = NotImplemented
         if recipe_row is not None:
-            recipe = objects.recipe(self, recipe_row)
+            recipe = objects.Recipe(self, recipe_row)
 
         return recipe
 
