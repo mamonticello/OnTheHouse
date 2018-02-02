@@ -11,6 +11,7 @@ from . import helpers
 from . import objects
 
 from voussoirkit import pathclass
+from voussoirkit import sqlhelpers
 
 
 logging.basicConfig()
@@ -116,15 +117,19 @@ class RecipeDB:
         if id is None and name is None:
             raise TypeError('id and name can\'t both be None.')
 
+        cur = self.sql.cursor()
         if id is not None:
             # fetch by ID
-            pass
+            ingredient = NotImplemented
         else:
             # fetch by Name
             # make sure to check the autocorrect table first.
-            pass
+            cur.execute('SELECT * FROM Ingredient WHERE name = ?', [name])
+            ingredient_row = cur.fetchone()
+            if ingredient_row is None:
+                raise ValueError(ingredient_row)
+            ingredient = objects.Ingredient(self, ingredient_row)
 
-        ingredient = NotImplemented
         return ingredient
 
     def get_recipe(self, id):
@@ -157,8 +162,24 @@ class RecipeDB:
         '''
         # Check if this name is already taken by the autocorrect or other ing.
         # - if so, raise an exception.
-        # INSERT statement
-        ingredient = NotImplemented
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM Ingredient WHERE name = ?', [name])
+        ingredient_row = cur.fetchone()
+        self.log.debug(ingredient_row)
+        if ingredient_row is not None:
+            raise ValueError()
+
+        data = {
+            'IngredientID': helpers.random_hex(),
+            'Name': name,
+        }
+
+        (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_INGREDIENT_COLUMNS, data)
+        query = 'INSERT INTO Ingredient VALUES(%s)' % qmarks
+        cur.execute(query, bindings)
+        self.sql.commit()
+
+        ingredient = objects.Ingredient(self, data)
         return ingredient
 
     def new_recipe(
@@ -167,6 +188,7 @@ class RecipeDB:
             author: objects.User,
             blurb: str,
             country_of_origin: str,
+            cuisine: str,
             ingredients: list,
             instructions: str,
             meal_type: str,
@@ -180,11 +202,61 @@ class RecipeDB:
         author: May be a string representing the author's ID, or a User object.
         ingredients: A list of either ingredient's ID, or Ingredient objects.
         '''
+        cur = self.sql.cursor()
+
+        recipe_id = helpers.random_hex()
         # check if `author` is string and call get_user
-        # loop through ingredients, check if string and call get_ingredient
-        # - if an ingredient doesn't exist, create it.
-        # automatically generate random ID, current timestamp.
-        # Execute INSERT statement
-        # return the new Recipe object
-        recipe = NotImplemented
+        author_id = None
+
+        recipe_data = {
+            'RecipeID': recipe_id,
+            'Name': name,
+            'AuthorID': author_id,
+            'CountryOfOrigin': country_of_origin,
+            'MealType': meal_type,
+            'Cuisine': cuisine,
+            'PrepTime': prep_time,
+            'DateAdded': helpers.now(),
+            'DateModified': helpers.now(),
+            'Blurb': blurb,
+            'ServingSize': serving_size,
+            'Instructions': instructions,
+        }
+
+        (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_RECIPE_COLUMNS, recipe_data)
+        query = 'INSERT INTO Recipe VALUES(%s)' % qmarks
+        cur.execute(query, bindings)
+
+        def _normalize_ingredient(ingredient):
+            # Not worrying about quantities for now.
+            if isinstance(ingredient, str):
+                try:
+                    ingredient = self.get_ingredient(name=ingredient)
+                except Exception:
+                    ingredient = self.new_ingredient(ingredient)
+            elif isinstance(ingredient, objects.Ingredient):
+                pass
+            else:
+                raise TypeError('Type not recognized', ingredient)
+            return ingredient
+        ingredients = [_normalize_ingredient(ingredient) for ingredient in ingredients]
+
+        for ingredient in ingredients:
+            recipe_ingredient_data = {
+                'RecipeID': recipe_id,
+                'IngredientID': ingredient.id,
+                'IngredientQuantity': None,
+                'IngredientPrefix': None,
+                'IngredientSuffix': None,
+            }
+            (qmarks, bindings) = sqlhelpers.insert_filler(
+                constants.SQL_RECIPEINGREDIENT_COLUMNS,
+                recipe_ingredient_data
+            )
+            query = 'INSERT INTO Recipe_Ingredient_Map VALUES(%s)' % qmarks
+            cur.execute(query, bindings)
+
+        self.sql.commit()
+
+        recipe = objects.Recipe(self, recipe_data)
         return recipe
