@@ -1,3 +1,5 @@
+from . import constants
+
 class ObjectBase:
     def __init__(self, recipedb):
         super().__init__()
@@ -24,7 +26,7 @@ class Image(ObjectBase):
     def __init__(self, recipedb, db_row):
         super().__init__(recipedb)
         if isinstance(db_row, (list, tuple)):
-            db_row = dict(zip(constants.SQL_USER_COLUMNS, db_row))
+            db_row = dict(zip(constants.SQL_IMAGE_COLUMNS, db_row))
 
         self.id = db_row['ImageID']
         self.file_path = db_row['ImageFilePath']
@@ -33,7 +35,7 @@ class Ingredient(ObjectBase):
     def __init__(self, recipedb, db_row):
         super().__init__(recipedb)
         if isinstance(db_row, (list, tuple)):
-            db_row = dict(zip(constants.SQL_USER_COLUMNS, db_row))
+            db_row = dict(zip(constants.SQL_INGREDIENT_COLUMNS, db_row))
 
         self.id = db_row['IngredientID']
         self.name = db_row['Name']
@@ -42,7 +44,7 @@ class IngredientTag(ObjectBase):
     def __init__(self, recipedb, db_row):
         super().__init__(recipedb)
         if isinstance(db_row, (list, tuple)):
-            db_row = dict(zip(constants.SQL_USER_COLUMNS, db_row))
+            db_row = dict(zip(constants.SQL_INGREDIENTTAG_COLUMNS, db_row))
 
         self.id = db_row['IngredientTagID']
         self.name = db_row['TagName']
@@ -52,7 +54,7 @@ class Recipe(ObjectBase):
     def __init__(self, recipedb, db_row):
         super().__init__(recipedb)
         if isinstance(db_row, (list, tuple)):
-            db_row = dict(zip(constants.SQL_USER_COLUMNS, db_row))
+            db_row = dict(zip(constants.SQL_RECIPE_COLUMNS, db_row))
 
         self.id = db_row['RecipeID']
         self.name = db_row['Name']
@@ -71,7 +73,7 @@ class Review(ObjectBase):
     def __init__(self, recipedb, db_row):
         super().__init__(recipedb)
         if isinstance(db_row, (list, tuple)):
-            db_row = dict(zip(constants.SQL_USER_COLUMNS, db_row))
+            db_row = dict(zip(constants.SQL_REVIEW_COLUMNS, db_row))
 
         self.id = db_row['ReviewID']
         self.author_id = db_row['AuthorID']
