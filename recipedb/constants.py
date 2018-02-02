@@ -66,6 +66,8 @@ CREATE TABLE IF NOT EXISTS Recipe_Ingredient_Map(
     RecipeID TEXT,
     IngredientID TEXT,
     IngredientQuantity TEXT,
+    IngredientPrefix TEXT,
+    IngredientSuffix TEXT,
     FOREIGN KEY(RecipeID) REFERENCES Recipe(RecipeID),
     FOREIGN KEY(IngredientID) REFERENCES Ingredient(IngredientID)
 );
