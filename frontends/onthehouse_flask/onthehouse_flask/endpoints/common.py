@@ -29,6 +29,8 @@ site.jinja_env.trim_blocks = True
 site.jinja_env.lstrip_blocks = True
 site.debug = True
 
+rdb = recipedb.RecipeDB()
+
 
 def back_url():
     return request.args.get('goto') or request.referrer or '/'

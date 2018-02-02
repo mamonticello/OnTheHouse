@@ -2,7 +2,7 @@ import flask; from flask import request
 import random
 
 from . import common
-
+from . import recipe_endpoint
 
 site = common.site
 
@@ -10,6 +10,7 @@ site = common.site
 @site.route('/')
 def root():
     return flask.render_template('root.html')
+
 
 @site.route('/favicon.ico')
 @site.route('/favicon.png')
