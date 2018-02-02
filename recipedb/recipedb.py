@@ -104,6 +104,29 @@ class RecipeDB:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
 
+    def get_ingredient(
+            self,
+            *,
+            id=None,
+            name=None,
+        ):
+        '''
+
+        '''
+        if id is None and name is None:
+            raise TypeError('id and name can\'t both be None.')
+
+        if id is not None:
+            # fetch by ID
+            pass
+        else:
+            # fetch by Name
+            # make sure to check the autocorrect table first.
+            pass
+
+        ingredient = NotImplemented
+        return ingredient
+
     def new_recipe(
             self,
             *,
@@ -125,6 +148,7 @@ class RecipeDB:
         '''
         # check if `author` is string and call get_user
         # loop through ingredients, check if string and call get_ingredient
+        # - if an ingredient doesn't exist, create it.
         # automatically generate random ID, current timestamp.
         # Execute INSERT statement
         # return the new Recipe object
