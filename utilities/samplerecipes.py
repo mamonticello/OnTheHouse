@@ -99,29 +99,6 @@ serving_size = 10)
 # 5
 rdb.new_recipe(
 author = "Food Network",
-blurb = "Recipe courtesy of Chocolateria San Gines",
-country_of_origin = "Unknown",
-cuisine = "Unknown",
-ingredients = ["water",
-           "butter",
-           "salt",
-           "all-purpose flour",
-           "egg",
-           "vegetable oil",
-           "sugar",
-           "cinnamon",
-           "cornstarch",
-           "milk",
-           "dark chocolate"],
-instructions = "To make the churro dough: Combine 1 cup of water with the butter or margarine and the salt in a saucepan and bring to a boil over high heat. Using a wooden spoon, stir in flour. Reduce the heat to low and stir vigorously until the mixture forms a ball, about 1 minute. Remove the dough from the heat and, while stirring constantly, gradually beat the eggs into the dough.\nTo make the chocolate for dunking: In a small bowl, dissolve the cornstarch in 1 cup of milk and reserve. Combine the chocolate with the remaining cup of milk in a saucepan. Stirring constantly, melt the chocolate over medium-low heat. Whisk the sugar and the dissolved cornstarch into the melted chocolate mixture. Reduce the heat to low and cook, whisking constantly, until the chocolate is thickened, about 5 minutes. (Add extra cornstarch if it doesn't start to thicken after 5 minutes.) Remove the pan from the heat and whisk until smooth then reserve in a warm place.\nHeat about 2 inches of oil in a heavy, high-sided pot over medium-high heat until the oil reaches 360 degrees F. Mix the sugar with the cinnamon on a plate and reserve.\nMeanwhile, spoon the churro dough into a pastry bag fitted with a large tip. Squeeze a 4- inch strip of dough into the hot oil. Repeat, frying 3 or 4 strips at a time. Fry the churros, turning them once, until golden brown, about 2 minutes per side. Transfer the cooked churros to a plate lined with paper towels to drain.\nWhen the churros are just cool enough to handle, roll them in the cinnamon-sugar (in Spain churros are simply rolled in sugar.)\nPour the chocolate into individual bowls or cups. Serve the warm churros with the chocolate dip.",
-meal_type = "Dessert",
-name = "Churros",
-prep_time = 40,
-serving_size = 10)
-
-# 6
-rdb.new_recipe(
-author = "Food Network",
 blurb = "Recipe courtesy of Jill Davie",
 country_of_origin = "Unknown",
 cuisine = "Unknown",
@@ -142,7 +119,7 @@ name = "Sushi",
 prep_time = 55,
 serving_size = 30)
 
-# 7
+# 6
 rdb.new_recipe(
 author = "Food Network",
 blurb = "Recipe courtesy of Jill Davie",
@@ -165,7 +142,7 @@ name = "Sushi Rolls",
 prep_time = 55,
 serving_size = 30)
 
-# 8
+# 7
 rdb.new_recipe(
 author = "Cultures for Health",
 blurb = "Sauerkraut is probably the most well-known lacto-fermented vegetable. Like any traditionally homemade food, sauerkraut can be made in a number of ways. Even if each kraut-making method is different there are a few common basics to remember when fermenting sauerkraut at home.",
@@ -179,7 +156,7 @@ name = "Homemade Sauerkraut",
 prep_time = 10,
 serving_size = 8)
 
-# 9
+# 8
 rdb.new_recipe(
 author = "Better Homes and Gardens",
 blurb = "Always a hit at our annual staff Christmas party.",
@@ -200,7 +177,7 @@ name = "Eggnog",
 prep_time = 15,
 serving_size = 10)
 
-# 10
+# 9
 rdb.new_recipe(
 author = "Better Homes and Gardens",
 blurb = "Eat your cake and diet, too. Angel Cake is low in calories and has no fat.",
@@ -218,7 +195,7 @@ name = "Angel Cake",
 prep_time = 60,
 serving_size = 12)
 
-# 11
+# 10
 rdb.new_recipe(
 author = "Hank's Mom",
 blurb = "This recipe has been handed down from my mother. It is a family favorite and will not be replaced! (Definite husband pleaser!)",
@@ -241,7 +218,7 @@ name = "Spaghetti Sauce with Ground Beef",
 prep_time = 85,
 serving_size = 6)
 
-# 12
+# 11
 rdb.new_recipe(
 author = "Emilie S.",
 blurb = "This is a very fun recipe to follow, because Grandma makes it sweet and simple. This pie is thickened with cornstarch and flour in addition to egg yolks, and contains no milk.",
@@ -263,7 +240,7 @@ name = "Grandma's Lemon Meringue",
 prep_time = 40,
 serving_size = 8)
 
-# 13
+# 12
 rdb.new_recipe(
 author = "Alton Brown",
 blurb = "This grilled cheese sandwich recipe actually grills the cheese.",
@@ -285,7 +262,7 @@ name = "Grilled Grilled Cheese",
 prep_time = 30,
 serving_size = 2)
 
-# 14
+# 13
 rdb.new_recipe(
 author = "Esmee Williams",
 blurb = "If you love good, old fashioned mashed potatoes this is the perfect recipe. Simple and delicious.",
@@ -302,7 +279,7 @@ name = "Basic Mashed Potatoes",
 prep_time = 35,
 serving_size = 4)
 
-# 15
+# 14
 rdb.new_recipe(
 author = "Better Homes and Gardens",
 blurb = "A classic creamy sauce with a rich lemon flavor.",
