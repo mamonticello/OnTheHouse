@@ -58,9 +58,10 @@ CREATE INDEX IF NOT EXISTS index_Recipe_RecipeID on Recipe(RecipeID);
 ----------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS Ingredient(
     IngredientID TEXT PRIMARY KEY,
-    Name TEXT
+    Name TEXT COLLATE NOCASE
 );
 CREATE INDEX IF NOT EXISTS index_Ingredient_IngredientID on Ingredient(IngredientID);
+CREATE INDEX IF NOT EXISTS index_Ingredient_Name on Ingredient(Name COLLATE NOCASE);
 ----------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS Recipe_Ingredient_Map(
     RecipeID TEXT,

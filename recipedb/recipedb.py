@@ -165,7 +165,6 @@ class RecipeDB:
         cur = self.sql.cursor()
         cur.execute('SELECT * FROM Ingredient WHERE name = ?', [name])
         ingredient_row = cur.fetchone()
-        self.log.debug(ingredient_row)
         if ingredient_row is not None:
             raise ValueError()
 
@@ -180,6 +179,7 @@ class RecipeDB:
         self.sql.commit()
 
         ingredient = objects.Ingredient(self, data)
+        self.log.debug('Created ingredient %s', ingredient.name)
         return ingredient
 
     def new_recipe(
@@ -259,4 +259,5 @@ class RecipeDB:
         self.sql.commit()
 
         recipe = objects.Recipe(self, recipe_data)
+        self.log.debug('Created recipe %s', recipe.name)
         return recipe
