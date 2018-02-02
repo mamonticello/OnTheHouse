@@ -8,6 +8,7 @@ import tempfile
 from . import constants
 from . import exceptions
 from . import helpers
+from . import objects
 
 from voussoirkit import pathclass
 
@@ -21,7 +22,6 @@ class RecipeDB:
             data_directory=None,
         ):
         super().__init__()
-
 
         if data_directory is None:
             data_directory = constants.DEFAULT_DATADIR
@@ -103,3 +103,30 @@ class RecipeDB:
             with open(self.config_filepath.absolute_path, 'w') as handle:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
+
+    def new_recipe(
+            self,
+            *,
+            author: objects.User,
+            blurb: str,
+            country_of_origin: str,
+            ingredients: list,
+            instructions: str,
+            meal_type: str,
+            name: str,
+            prep_time: int,
+            serving_size: int,
+        ):
+        '''
+        Add a new recipe to the database.
+
+        author: May be a string representing the author's ID, or a User object.
+        ingredients: A list of either ingredient's ID, or Ingredient objects.
+        '''
+        # check if `author` is string and call get_user
+        # loop through ingredients, check if string and call get_ingredient
+        # automatically generate random ID, current timestamp.
+        # Execute INSERT statement
+        # return the new Recipe object
+        recipe = NotImplemented
+        return recipe
