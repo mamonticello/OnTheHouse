@@ -142,7 +142,7 @@ class RecipeDB:
         recipe_row = cur.fetchone()
         recipe = NotImplemented
         if recipe_row is not None:
-            recipe = objects.recipe(recipe_row)
+            recipe = objects.recipe(self, recipe_row)
 
         return recipe
 
@@ -153,7 +153,7 @@ class RecipeDB:
         cur = self.sql.cursor()
         cur.execute('SELECT * FROM Recipe')
         recipe_rows = cur.fetchall()
-        recipe_objects = [objects.Recipe(row) for row in recipe_rows]
+        recipe_objects = [objects.Recipe(self, row) for row in recipe_rows]
         return recipe_objects
 
     def new_ingredient(self, name):
