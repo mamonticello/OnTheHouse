@@ -135,6 +135,16 @@ class RecipeDB:
         recipe = NotImplemented
         return recipe
 
+    def new_ingredient(self, name):
+        '''
+        Add a new Ingredient to the database.
+        '''
+        # Check if this name is already taken by the autocorrect or other ing.
+        # - if so, raise an exception.
+        # INSERT statement
+        ingredient = NotImplemented
+        return ingredient
+
     def new_recipe(
             self,
             *,
