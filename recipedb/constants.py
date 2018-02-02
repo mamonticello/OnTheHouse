@@ -95,8 +95,10 @@ def _extract_column_names(table):
     statement = DB_INIT.split('CREATE TABLE IF NOT EXISTS %s(' % table)[1]
     statement = statement.split(');')[0]
     statement = statement.replace('\n', ' ')
-    columns = statement.split(',')
-    columns = [column.strip().split(' ')[0] for column in columns]
+    statements = statement.split(',')
+    statements = [statement.strip() for statement in statements]
+    columns = [statement for statement in statements if 'FOREIGN KEY' not in statement]
+    columns = [column.split(' ')[0] for column in columns]
     return columns
 
 SQL_IMAGE_COLUMNS = _extract_column_names('Image')
