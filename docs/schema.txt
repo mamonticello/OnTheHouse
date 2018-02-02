@@ -68,6 +68,8 @@ Recipe_Ingredient_Map
 RecipeID string FK >- Recipe.RecipeID
 IngredientID string FK >- Ingredient.IngredientID
 IngredientQuantity string
+IngredientPrefix string
+IngredientSuffix string
 
 Ingredient_IngredientTag_Map
 -
