@@ -132,8 +132,24 @@ class RecipeDB:
         Fetch a single Recipe by its ID.
         '''
         # SQL SELECT query and use row to construct Recipe object.
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM Recipe WHERE id=?', [id])
+        recipe_row = cur.fetchone()
         recipe = NotImplemented
+        if recipe_row is not None:
+            recipe = objects.recipe(recipe_row)
+
         return recipe
+
+    def get_recipes(self):
+        '''
+        Returns all recipes
+        '''
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM Recipe')
+        recipe_rows = cur.fetchall()
+        recipe_objects = [objects.Recipe(row) for row in recipe_rows]
+        return recipe_objects
 
     def new_ingredient(self, name):
         '''
