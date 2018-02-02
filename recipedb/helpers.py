@@ -3,6 +3,7 @@ This file contains toplevel functions that are used throughout the program
 but don't belong to any one class in particular.
 '''
 import datetime
+import math
 import os
 import unicodedata
 
@@ -18,6 +19,12 @@ def now(timestamp=True):
     if timestamp:
         return n.timestamp()
     return n
+
+def random_hex(length=12):
+    randbytes = os.urandom(math.ceil(length / 2))
+    token = ''.join('{:02x}'.format(x) for x in randbytes)
+    token = token[:length]
+    return token
 
 def read_filebytes(filepath, range_min, range_max, chunk_size=2 ** 20):
     '''
