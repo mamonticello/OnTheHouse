@@ -111,7 +111,7 @@ class RecipeDB:
             name=None,
         ):
         '''
-
+        Fetch a single Ingredient by its ID or name.
         '''
         if id is None and name is None:
             raise TypeError('id and name can\'t both be None.')
@@ -126,6 +126,14 @@ class RecipeDB:
 
         ingredient = NotImplemented
         return ingredient
+
+    def get_recipe(self, id):
+        '''
+        Fetch a single Recipe by its ID.
+        '''
+        # SQL SELECT query and use row to construct Recipe object.
+        recipe = NotImplemented
+        return recipe
 
     def new_recipe(
             self,
