@@ -26,18 +26,40 @@ CREATE TABLE IF NOT EXISTS Image(
 );
 CREATE INDEX IF NOT EXISTS index_Image_ImageID on Image(ImageID);
 ----------------------------------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS User(
-    UserID TEXT PRIMARY KEY,
-    Username TEXT COLLATE NOCASE,
-    DisplayName TEXT COLLATE NOCASE,
-    BioText TEXT,
-    DateJoined INT,
-    PasswordHash BLOB,
-    ProfileImageID TEXT,
-    FOREIGN KEY(ProfileImageID) REFERENCES Image(ImageID)
+CREATE TABLE IF NOT EXISTS Image_Recipe_Map(
+    RecipeID TEXT,
+    ImageID TEXT,
+    FOREIGN KEY(RecipeID) REFERENCES Recipe(RecipeID),
+    FOREIGN KEY(ImageID) REFERENCES Image(ImageID)
 );
-CREATE INDEX IF NOT EXISTS index_User_UserID on User(UserID);
-CREATE INDEX IF NOT EXISTS index_User_Username on User(Username COLLATE NOCASE);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS Ingredient(
+    IngredientID TEXT PRIMARY KEY,
+    Name TEXT COLLATE NOCASE
+);
+CREATE INDEX IF NOT EXISTS index_Ingredient_IngredientID on Ingredient(IngredientID);
+CREATE INDEX IF NOT EXISTS index_Ingredient_Name on Ingredient(Name COLLATE NOCASE);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS IngredientAutocorrect(
+    IngredientID TEXT,
+    AlternateName TEXT,
+    FOREIGN KEY(IngredientID) REFERENCES Ingredient(IngredientID)
+);
+CREATE INDEX IF NOT EXISTS index_IngredientAutocorrect_AlternateName on IngredientAutocorrect(AlternateName);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS IngredientTag(
+    IngredientTagID TEXT PRIMARY KEY,
+    TagName TEXT,
+    ParentTagID TEXT
+);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS Ingredient_IngredientTag_Map(
+    IngredientID TEXT,
+    IngredientTagID TEXT,
+    FOREIGN KEY(IngredientID) REFERENCES Ingredient(IngredientID),
+    FOREIGN KEY(IngredientTagID) REFERENCES IngredientTag(IngredientTagID)
+);
+CREATE INDEX IF NOT EXISTS index_IngredientIngredientTagMap_IngredientID on Ingredient_IngredientTag_Map(IngredientID);
 ----------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS Recipe(
     RecipeID TEXT PRIMARY KEY,
@@ -56,13 +78,6 @@ CREATE TABLE IF NOT EXISTS Recipe(
 );
 CREATE INDEX IF NOT EXISTS index_Recipe_RecipeID on Recipe(RecipeID);
 ----------------------------------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS Ingredient(
-    IngredientID TEXT PRIMARY KEY,
-    Name TEXT COLLATE NOCASE
-);
-CREATE INDEX IF NOT EXISTS index_Ingredient_IngredientID on Ingredient(IngredientID);
-CREATE INDEX IF NOT EXISTS index_Ingredient_Name on Ingredient(Name COLLATE NOCASE);
-----------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS Recipe_Ingredient_Map(
     RecipeID TEXT,
     IngredientID TEXT,
@@ -72,6 +87,8 @@ CREATE TABLE IF NOT EXISTS Recipe_Ingredient_Map(
     FOREIGN KEY(RecipeID) REFERENCES Recipe(RecipeID),
     FOREIGN KEY(IngredientID) REFERENCES Ingredient(IngredientID)
 );
+CREATE INDEX IF NOT EXISTS index_RecipeIngredientMap_RecipeID on Recipe_Ingredient_Map(RecipeID);
+CREATE INDEX IF NOT EXISTS index_RecipeIngredientMap_IngredientID on Recipe_Ingredient_Map(IngredientID);
 ----------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS Review(
     ReviewID TEXT PRIMARY KEY,
@@ -82,14 +99,39 @@ CREATE TABLE IF NOT EXISTS Review(
     FOREIGN KEY(AuthorID) REFERENCES User(UserID),
     FOREIGN KEY(RecipeID) REFERENCES Recipe(RecipeID)
 );
+CREATE INDEX IF NOT EXISTS index_Review_ReviewID on Review(ReviewID);
+CREATE INDEX IF NOT EXISTS index_Review_AuthorID on Review(AuthorID);
+CREATE INDEX IF NOT EXISTS index_Review_RecipeID on Review(RecipeID);
 ----------------------------------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS IngredientTag(
-    IngredientTagID TEXT PRIMARY KEY,
-    TagName TEXT,
-    ParentTagID TEXT
+CREATE TABLE IF NOT EXISTS User(
+    UserID TEXT PRIMARY KEY,
+    Username TEXT COLLATE NOCASE,
+    DisplayName TEXT COLLATE NOCASE,
+    BioText TEXT,
+    DateJoined INT,
+    PasswordHash BLOB,
+    ProfileImageID TEXT,
+    FOREIGN KEY(ProfileImageID) REFERENCES Image(ImageID)
 );
+CREATE INDEX IF NOT EXISTS index_User_UserID on User(UserID);
+CREATE INDEX IF NOT EXISTS index_User_Username on User(Username COLLATE NOCASE);
 ----------------------------------------------------------------------------------------------------
-
+CREATE TABLE IF NOT EXISTS UserSettings(
+    UserID TEXT,
+    SettingName TEXT,
+    SettingValue TEXT,
+    FOREIGN KEY(UserID) REFERENCES User(UserID)
+);
+CREATE INDEX IF NOT EXISTS index_UserSettings_UserID_SettingName on UserSettings(UserID, SettingName);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS User_Following_Map(
+    UserID TEXT,
+    TargetID TEXT,
+    FOREIGN KEY(UserID) REFERENCES User(UserID),
+    FOREIGN KEY(TargetID) REFERENCES User(UserID)
+);
+CREATE INDEX IF NOT EXISTS index_UserFollowingMap_UserID on User_Following_Map(UserID);
+CREATE INDEX IF NOT EXISTS index_UserFollowingMap_TargetID on User_Following_Map(TargetID);
 '''.format(user_version=DATABASE_VERSION)
 
 def _extract_column_names(table):
