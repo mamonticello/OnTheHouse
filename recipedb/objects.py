@@ -31,6 +31,7 @@ class Image(ObjectBase):
         self.id = db_row['ImageID']
         self.file_path = db_row['ImageFilePath']
 
+
 class Ingredient(ObjectBase):
     def __init__(self, recipedb, db_row):
         super().__init__(recipedb)
@@ -39,6 +40,18 @@ class Ingredient(ObjectBase):
 
         self.id = db_row['IngredientID']
         self.name = db_row['Name']
+
+    def add_tag(self, tag):
+        raise NotImplementedError
+
+    def remove_tag(self, tag):
+        raise NotImplementedError
+
+    def rename(self, name):
+        # Check if `name` is already taken by an other ingredient
+        # or is in the autocorrect table.
+        raise NotImplementedError
+
 
 class IngredientTag(ObjectBase):
     def __init__(self, recipedb, db_row):
@@ -49,6 +62,11 @@ class IngredientTag(ObjectBase):
         self.id = db_row['IngredientTagID']
         self.name = db_row['TagName']
         self.parent_id = db_row['ParentTagID']
+
+    def rename(self, name):
+        # Check if `name` is already taken somewhere else.
+        raise NotImplementedError
+
 
 class Recipe(ObjectBase):
     def __init__(self, recipedb, db_row):
@@ -69,6 +87,29 @@ class Recipe(ObjectBase):
         self.serving_size = db_row['ServingSize']
         self.instructions = db_row['Instructions']
 
+    def get_ingredients(self):
+        raise NotImplementedError
+
+    def edit(
+            self,
+            *,
+            ingredients=None,
+            blurb=None,
+        ):
+        '''
+        Let's add the rest of the arguments that we want to be able to edit.
+        '''
+        if blurb is not None:
+            self.blurb = blurb
+
+        # if NEW_ATTRIBUTE is not None:
+        #    self.ATTRIBUTE = NEW_ATTRIBUTE
+
+        self.date_mod = helpers.now()
+        # SQL UPDATE statement to apply new properties.
+        raise NotImplementedError
+
+
 class Review(ObjectBase):
     def __init__(self, recipedb, db_row):
         super().__init__(recipedb)
@@ -80,6 +121,17 @@ class Review(ObjectBase):
         self.recipe_id = db_row['RecipeID']
         self.score = db_row['Score']
         self.text = db_row['Text']
+
+    def edit(self, score=None, text=None):
+        if score is not None:
+            self.score = score
+
+        if text is not None:
+            self.text = text
+
+        # SQL UPDATE
+        raise NotImplementedError
+
 
 class User(ObjectBase):
     def __init__(self, recipedb, db_row):
@@ -93,3 +145,14 @@ class User(ObjectBase):
         self.bio_text = db_row['BioText']
         self.date_joined = db_row['DateJoined']
         self.profile_image_id = db_row['ProfileImageID']
+        self.profile_pic = self.photodb.get_image(self.profile_image_id)
+
+    def set_display_name(self, display_name):
+        raise NotImplementedError
+
+    def set_profile_pic(self, image):
+        raise NotImplementedError
+        self.profile_image_id = image.id
+
+    def set_bio(self, bio_text):
+        raise NotImplementedError

@@ -105,6 +105,9 @@ class RecipeDB:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
 
+    def get_image(self, id):
+        raise NotImplementedError
+
     def get_ingredient(
             self,
             *,
@@ -132,6 +135,28 @@ class RecipeDB:
 
         return ingredient
 
+    def get_ingredient_tag(
+            self,
+            *,
+            id=None,
+            name=None,
+        ):
+        '''
+        Fetch a single IngredientTag by its ID or name.
+        '''
+        if id is None and name is None:
+            raise TypeError('id and name can\'t both be None.')
+
+        cur = self.sql.cursor()
+        if id is not None:
+            # fetch by ID
+            pass
+        else:
+            # fetch by Name
+            pass
+
+        raise NotImplementedError
+
     def get_recipe(self, id):
         '''
         Fetch a single Recipe by its ID.
@@ -140,9 +165,10 @@ class RecipeDB:
         cur = self.sql.cursor()
         cur.execute('SELECT * FROM Recipe WHERE RecipeID =?', [id])
         recipe_row = cur.fetchone()
-        recipe = NotImplemented
         if recipe_row is not None:
             recipe = objects.Recipe(self, recipe_row)
+        else:
+            raise ValueError('Recipe %s does not exist' % id)
 
         return recipe
 
@@ -156,6 +182,13 @@ class RecipeDB:
         recipe_objects = [objects.Recipe(self, row) for row in recipe_rows]
         return recipe_objects
 
+    def new_image(self, filepath):
+        '''
+        Register a new image in the database.
+        This assumes that the filepath is already in the correct location.
+        '''
+        raise NotImplementedError
+
     def new_ingredient(self, name):
         '''
         Add a new Ingredient to the database.
@@ -166,7 +199,7 @@ class RecipeDB:
         cur.execute('SELECT * FROM Ingredient WHERE name = ?', [name])
         ingredient_row = cur.fetchone()
         if ingredient_row is not None:
-            raise ValueError()
+            raise ValueError('Ingredient %s already exists' % name)
 
         data = {
             'IngredientID': helpers.random_hex(),
@@ -181,6 +214,12 @@ class RecipeDB:
         ingredient = objects.Ingredient(self, data)
         self.log.debug('Created ingredient %s', ingredient.name)
         return ingredient
+
+    def new_ingredient_tag(self, name, parent=None):
+        '''
+        Create a new IngredientTag, either a root or grouped under `parent`.
+        '''
+        raise NotImplementedError
 
     def new_recipe(
             self,
