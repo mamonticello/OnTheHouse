@@ -200,7 +200,22 @@ class RecipeDB:
     def new_image(self, filepath):
         '''
         Register a new image in the database.
-        This assumes that the filepath is already in the correct location.
+        Needs filepath generation based on ID
+        Potentially needs file moving from temp dir to filepath after generation
+
+        data = {
+            'ImageID': helpers.random_hex(),
+            'ImageFilePath': filepath,
+        }
+
+        (qmarks,bindings) = sqlhelpers.insert_filler(constants.SQL_IMAGE_COLUMNS, data)
+        query = 'INSERT INTO Image VALUES(%s)' qmarks
+        cur.execute(query,bindings)
+        self.sql.commit()
+
+        image = objects.Image(self, data)
+        self.log.debug('Created image with ID: %s, filepath: %s' % (image.id,image.file_path)
+        return image
         '''
         raise NotImplementedError
 
