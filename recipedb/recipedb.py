@@ -234,6 +234,7 @@ class RecipeDB:
             name: str,
             prep_time: int,
             serving_size: int,
+            recipe_image: objects.image,
         ):
         '''
         Add a new recipe to the database.
@@ -260,6 +261,7 @@ class RecipeDB:
             'Blurb': blurb,
             'ServingSize': serving_size,
             'Instructions': instructions,
+            'RecipeID': recipe_image
         }
 
         (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_RECIPE_COLUMNS, recipe_data)
