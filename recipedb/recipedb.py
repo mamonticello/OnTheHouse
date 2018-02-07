@@ -123,7 +123,11 @@ class RecipeDB:
         cur = self.sql.cursor()
         if id is not None:
             # fetch by ID
-            ingredient = NotImplemented
+            cur.execute('SELECT * FROM Ingredient WHERE IngredientID = ?', [id])
+            ingredient_row = cur.fetchone()
+            if ingredient_row is None:
+                raise ValueError(ingredient_row)
+            ingredient = objects.Ingredient(self, ingredient_row)
         else:
             # fetch by Name
             # make sure to check the autocorrect table first.
