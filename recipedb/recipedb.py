@@ -106,7 +106,18 @@ class RecipeDB:
         return config
 
     def get_image(self, id):
-        raise NotImplementedError
+        '''
+        Fetch an image by its ID
+        '''
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM Image WHERE ImageID = ?', [id])
+        image_row = cur.fetchone()
+        if image_row is not None:
+            image = objects.Image(self, image_row)
+        else:
+            raise ValueError('Image %s does not exist' % id)
+
+        return image
 
     def get_ingredient(
             self,
