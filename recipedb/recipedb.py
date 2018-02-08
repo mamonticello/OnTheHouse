@@ -232,7 +232,7 @@ class RecipeDB:
         '''
         #generate id and generate new filepath based on id
         id = helpers.random_hex()
-        filetype = filepath.split('.',1)[1]
+        filetype = filepath.rsplit('.',1)[1]
         new_filepath = '\\'.join(id[i:i+4] for i in range(0, len(id), 4)) + '.' + filetype
         shutil.copyfile(filepath,new_filepath)
         data = {
@@ -245,7 +245,7 @@ class RecipeDB:
         cur.execute(query,bindings)
         self.sql.commit()
         image = objects.Image(self, data)
-        self.log.debug('Created image with ID: %s, filepath: %s' % (image.id,image.file_path)
+        self.log.debug('Created image with ID: %s, filepath: %s' % (image.id,image.file_path))
         return image
 
     def new_ingredient(self, name):
