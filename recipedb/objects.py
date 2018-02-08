@@ -68,6 +68,14 @@ class IngredientTag(ObjectBase):
         raise NotImplementedError
 
 
+class QuantitiedIngredient:
+    def __init__(self, ingredient, *, quantity=None, prefix=None, suffix=None):
+        self.ingredient = ingredient
+        self.quantity = quantity
+        self.prefix = prefix
+        self.suffix = suffix
+
+
 class Recipe(ObjectBase):
     def __init__(self, recipedb, db_row):
         super().__init__(recipedb)
