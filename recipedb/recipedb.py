@@ -143,17 +143,16 @@ class RecipeDB:
             # fetch by ID
             cur.execute('SELECT * FROM Ingredient WHERE IngredientID = ?', [id])
             ingredient_row = cur.fetchone()
-            if ingredient_row is None:
-                raise ValueError(ingredient_row)
-            ingredient = objects.Ingredient(self, ingredient_row)
         else:
             # fetch by Name
             # make sure to check the autocorrect table first.
             cur.execute('SELECT * FROM Ingredient WHERE Name = ?', [name])
             ingredient_row = cur.fetchone()
-            if ingredient_row is None:
-                raise ValueError(ingredient_row)
-            ingredient = objects.Ingredient(self, ingredient_row)
+
+        if ingredient_row is None:
+            raise exceptions.NoSuchIngredient(id or ingredient)
+
+        ingredient = objects.Ingredient(self, ingredient_row)
 
         return ingredient
 
