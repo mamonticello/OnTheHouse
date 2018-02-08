@@ -106,6 +106,29 @@ class RecipeDB:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
 
+    def _normalize_ingredient(ingredient):
+        '''
+        Try to convert the given input to a QuantitiedIngredient.
+        '''
+        if isinstance(ingredient, objects.QuantitiedIngredient):
+            return ingredient
+
+        if isinstance(ingredient, (tuple, list)):
+            (ingredient, quantity) = ingredient
+        else:
+            quantity = None
+
+        if isinstance(ingredient, str):
+            ingredient = self.get_or_create_ingredient(name=ingredient)
+
+        if isinstance(ingredient, objects.Ingredient):
+            ingredient = objects.QuantitiedIngredient(ingredient=ingredient, quantity=quantity)
+
+        if not isinstance(ingredient, objects.QuantitiedIngredient):
+            raise TypeError('Type not recognized', ingredient)
+
+        return ingredient
+
     def get_image(self, id):
         '''
         Fetch an image by its ID
@@ -305,27 +328,15 @@ class RecipeDB:
         query = 'INSERT INTO Recipe VALUES(%s)' % qmarks
         cur.execute(query, bindings)
 
-        def _normalize_ingredient(ingredient):
-            # Not worrying about quantities for now.
-            if isinstance(ingredient, str):
-                try:
-                    ingredient = self.get_ingredient(name=ingredient)
-                except Exception:
-                    ingredient = self.new_ingredient(ingredient)
-            elif isinstance(ingredient, objects.Ingredient):
-                pass
-            else:
-                raise TypeError('Type not recognized', ingredient)
-            return ingredient
-        ingredients = [_normalize_ingredient(ingredient) for ingredient in ingredients]
+        ingredients = [self._normalize_ingredient(ingredient) for ingredient in ingredients]
 
         for ingredient in ingredients:
             recipe_ingredient_data = {
                 'RecipeID': recipe_id,
                 'IngredientID': ingredient.id,
-                'IngredientQuantity': None,
-                'IngredientPrefix': None,
-                'IngredientSuffix': None,
+                'IngredientQuantity': ingredient.quantity,
+                'IngredientPrefix': ingredient.prefix,
+                'IngredientSuffix': ingredient.suffix,
             }
             (qmarks, bindings) = sqlhelpers.insert_filler(
                 constants.SQL_RECIPEINGREDIENT_COLUMNS,
