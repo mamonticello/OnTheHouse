@@ -350,3 +350,42 @@ class RecipeDB:
         recipe = objects.Recipe(self, recipe_data)
         self.log.debug('Created recipe %s', recipe.name)
         return recipe
+
+    def search(
+            self,
+            *,
+            author=None,
+            country=None,
+            cuisine=None,
+            ingredients=None,
+            ingredients_exclude=None,
+            limit=None,
+            meal_type=None,
+            name=None,
+            rating=None,
+        ):
+        '''
+        '''
+        cur = self.sql.cursor()
+
+        wheres = []
+
+        if wheres:
+            wheres = ' AND '.join(wheres)
+            wheres = 'WHERE ' + wheres
+        else:
+            wheres = ''
+
+        query = 'SELECT * FROM Recipe {wheres}'
+        query = query.format(wheres=wheres)
+
+        cur.execute(query)
+        while True:
+            recipe_row = cur.fetchone()
+            if recipe_row is None:
+                break
+            recipe = objects.Recipe(self, recipe_row)
+            # TESTS
+            results.append(recipe)
+
+        return results
