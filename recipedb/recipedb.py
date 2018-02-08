@@ -204,7 +204,7 @@ class RecipeDB:
         Needs base to append generated filepath to
         
         #generate id and generate new filepath based on id
-        id = str(helpers.random_hex())
+        id = helpers.random_hex()
         new_filepath = '\\'.join(id[i:i+4] for i in range(0, len(id), 4)) + ".jpg"
         data = {
             'ImageID': id,
