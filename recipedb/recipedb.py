@@ -4,6 +4,7 @@ import logging
 import os
 import sqlite3
 import tempfile
+import shutil
 
 from . import constants
 from . import exceptions
@@ -200,12 +201,14 @@ class RecipeDB:
     def new_image(self, filepath):
         '''
         Register a new image in the database.
-        Needs filepath generation based on ID
-        Potentially needs file moving from temp dir to filepath after generation
-
+        Needs base to append generated filepath to
+        
+        #generate id and generate new filepath based on id
+        id = str(helpers.random_hex())
+        new_filepath = '\\'.join(id[i:i+4] for i in range(0, len(id), 4)) + ".jpg"
         data = {
-            'ImageID': helpers.random_hex(),
-            'ImageFilePath': filepath,
+            'ImageID': id,
+            'ImageFilePath': new_filepath,
         }
 
         (qmarks,bindings) = sqlhelpers.insert_filler(constants.SQL_IMAGE_COLUMNS, data)
@@ -215,6 +218,7 @@ class RecipeDB:
 
         image = objects.Image(self, data)
         self.log.debug('Created image with ID: %s, filepath: %s' % (image.id,image.file_path)
+        shutil.copyfile(filepath,new_filepath)
         return image
         '''
         raise NotImplementedError
