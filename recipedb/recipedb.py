@@ -120,6 +120,12 @@ class RecipeDB:
 
         return image
 
+    def get_or_create_ingredient(self, name):
+        try:
+            return self.get_ingredient(name=name)
+        except exceptions.NoSuchIngredient:
+            return self.new_ingredient(name)
+
     def get_ingredient(
             self,
             *,
