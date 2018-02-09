@@ -420,7 +420,7 @@ class RecipeDB:
         cur = self.sql.cursor()
 
         user_id = helpers.random_hex()
-        password_hash = bcrypt.hashpw(password, bcrypt.gensalt())
+        password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         date_joined = helpers.now()
 
         if profile_image is not None:
