@@ -387,7 +387,7 @@ class RecipeDB:
                 break
             recipe = objects.Recipe(self, recipe_row)
             # TESTS
-            # results.append(recipe)
+            results.append(recipe)
 
         return results
     
