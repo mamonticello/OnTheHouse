@@ -404,7 +404,7 @@ class RecipeDB:
             username: str,
             display_name: str,
             password: str,
-            bio_text: str
+            bio_text: str,
             profile_image: objects.Image
         ):
         '''
