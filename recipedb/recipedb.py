@@ -446,7 +446,7 @@ class RecipeDB:
     
     def check_password(self,
                        *,
-                       user_id: int,
+                       user_id: str,
                        password: str
                       ):
         '''
