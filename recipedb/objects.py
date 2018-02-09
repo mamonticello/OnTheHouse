@@ -111,6 +111,7 @@ class Recipe(ObjectBase):
 
         self.id = db_row['RecipeID']
         self.name = db_row['Name']
+        self.slug = helpers.slugify(self.name)
         self.author_id = db_row['AuthorID']
         self.country = db_row['CountryOfOrigin']
         self.meal_type = db_row['MealType']
