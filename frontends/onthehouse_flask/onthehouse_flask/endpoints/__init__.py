@@ -3,6 +3,7 @@ import random
 
 from . import common
 from . import recipe_endpoint
+from . import profile_endpoint
 
 site = common.site
 
@@ -10,6 +11,12 @@ site = common.site
 @site.route('/')
 def root():
     return flask.render_template('root.html')
+
+
+@site.route('/img/<imgid>')
+def get_img(imgid):
+    img = common.rdb.get_image(imgid)
+    return flask.send_file(img.file_path)
 
 
 @site.route('/favicon.ico')

@@ -6,8 +6,7 @@ site = common.site
 
 
 @site.route('/recipe/<recipeid>')
-@site.route('/recipe/<recipeid>/<slug>')
-def recipe(recipeid, slug=None):
+def get_recipe(recipeid):
     recipe = common.rdb.get_recipe(recipeid)
     response = render_template("recipe.html", recipe=recipe)
     return response
