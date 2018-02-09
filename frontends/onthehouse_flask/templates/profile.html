@@ -90,12 +90,12 @@
                 </div>
             <div class="col-sm-12"></div>
             <div class="col-sm-12 user-recipes">
-                <h2 style="text-align:center;">User Recipes</h2>
+                <h2 style="text-align:center;">{{user.display_name}}'s Recipes</h2>
             </div>
             <div class="col-sm-12" style="margin-top: 50px"></div>
                 {% for recipe in recipes %}
                     <div class="col-sm-4 user-recipe">
-                        <img class="user-recipe-img" alt="Recipe Image">
+                        <a href="/recipe/{{recipe.id}}/{{recipe.slug}}"><img src="/image/{{recipe.recipe_image_id}}" height="120px" class="user-recipe-img" alt="Recipe Image"></a>
                         <h3>{{ recipe.Name }}</h3>
                         <h4>{{ recipe.DateAdded }}</h4>
                     </div>
