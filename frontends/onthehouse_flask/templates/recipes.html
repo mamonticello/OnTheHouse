@@ -60,7 +60,10 @@
             <div class="col-sm-12">
                 {% for recipe in recipes %}
                 <div class="col-sm-12">
-                    <a href="/recipe/{{ recipe.id }}" class="recipe-name">{{ recipe.name }}</a>
+                    <a href="/recipe/{{recipe.id}}/{{recipe.slug}}" class="recipe-name">
+                      <img src="/image/{{recipe.recipe_image_id}}" height="120px"/>
+                      {{ recipe.name }}
+                    </a>
                 </div>
                 {% endfor %}
             </div>
