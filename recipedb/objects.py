@@ -97,7 +97,7 @@ class QuantitiedIngredient(ObjectBase):
 
     @classmethod
     def from_existing(cls, ingredient, *, quantity=None, prefix=None, suffix=None):
-        self = cls()
+        self = cls(ingredient.recipedb, db_row=None)
         self.ingredient = ingredient
         self.quantity = quantity
         self.prefix = prefix
