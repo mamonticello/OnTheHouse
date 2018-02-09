@@ -7,8 +7,8 @@ site = common.site
 
 @site.route('/user/<profileid>')
 def get_user(profileid):
-    user = common.rdb.get_user(profileid)
-    recipes = common.rdb.search(user)
+    user = common.rdb.get_user(id=profileid)
+    recipes = common.rdb.search(author=user)
     profileimg = common.rdb.get_image(user.ProfileImageID)
     response = render_template("profile.html", user=user, recipes=recipes, profileimg = profileimg)
     return response
