@@ -305,8 +305,16 @@ class RecipeDB:
         cur = self.sql.cursor()
 
         recipe_id = helpers.random_hex()
-        # check if `author` is string and call get_user
-        author_id = None
+
+        if author is not None:
+            author_id = author.id
+        else:
+            author_id = None
+
+        if recipe_image is not None:
+            recipe_image_id = recipe_image.id
+        else:
+            recipe_image_id = None
 
         recipe_data = {
             'RecipeID': recipe_id,
@@ -321,7 +329,7 @@ class RecipeDB:
             'Blurb': blurb,
             'ServingSize': serving_size,
             'Instructions': instructions,
-            'RecipeImageID': recipe_image.id,
+            'RecipeImageID': recipe_image_id,
         }
 
         (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_RECIPE_COLUMNS, recipe_data)
@@ -407,17 +415,19 @@ class RecipeDB:
         user_id = helpers.random_hex()
         password_hash = bcrypt.hashpw(password, bcrypt.gensalt())
         date_joined = helpers.now()
-        profile_image_id = profile_image.id
-        profile_pic = profile_image.file_path
+
+        if profile_image is not None:
+            profile_image_id = profile_image.id
+        else:
+            profile_image_id = None
 
         user_data = {
             'UserID': user_id,
             'Username': username,
             'DisplayName': display_name,
             'PasswordHash': password_hash,
-            'DateJoined': date_joined
-            'ProfileImageID': profile_image_id
-            'ProfilePic': profile_pic
+            'DateJoined': date_joined,
+            'ProfileImageID': profile_image_id,
         }
 
         (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_USER_COLUMNS, user_data)
