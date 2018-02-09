@@ -395,7 +395,6 @@ class RecipeDB:
             display_name: str,
             password: str,
             bio_text: str
-            date_joined: int
             profile_image: objects.Image
         ):
         '''
@@ -405,6 +404,7 @@ class RecipeDB:
 
         user_id = helpers.random_hex()
         password_hash = bcrypt.hashpw(password, bcrypt.gensalt())
+        date_joined = helpers.now()
         profile_image_id = profile_image.id
         profile_pic = profile_image.file_path
 
@@ -424,7 +424,7 @@ class RecipeDB:
 
         self.sql.commit()
 
-        User = objects.Recipe(self, user_data)
+        user = objects.User(self, user_data)
         self.log.debug('Created user %s',user.username)
         return user
     
