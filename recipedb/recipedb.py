@@ -463,7 +463,7 @@ class RecipeDB:
             password: str,
             bio_text: str,
             profile_image: objects.Image
-    ):
+        ):
         '''
         Register a new User to the database
         '''
@@ -498,13 +498,21 @@ class RecipeDB:
         self.log.debug('Created user %s', user.username)
         return user
 
-    def get_user(self, id):
+    def get_user(self, *, id=None, username=None):
         '''
         Fetch an user by their ID
         '''
+        if id is None and username is None:
+            raise TypeError('id and username can\'t both be None.')
+
         cur = self.sql.cursor()
-        cur.execute('SELECT * FROM User WHERE UserID = ?', [id])
-        user_row = cur.fetchone()
+        if id is not None:
+            cur.execute('SELECT * FROM User WHERE UserID = ?', [id])
+            user_row = cur.fetchone()
+        else:
+            cur.execute('SELECT * FROM User Where Username = ?', [username])
+            user_row = cur.fetchone()
+
         if user_row is not None:
             user = objects.User(self, user_row)
         else:
@@ -512,13 +520,14 @@ class RecipeDB:
 
         return user
 
-    def check_password(self,
-                       *,
-                       user_id: str,
-                       password: str
-                       ):
+    def check_password(
+            self,
+            *,
+            user_id: str,
+            password: str,
+        ):
         '''
         Check a typed password against the user's password
         '''
-        user = get_user(user_id)
+        user = get_user(id=user_id)
         return bcrypt.checkpw(password, user.password_hash)

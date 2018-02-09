@@ -192,7 +192,10 @@ class User(ObjectBase):
         self.bio_text = db_row['BioText']
         self.date_joined = db_row['DateJoined']
         self.profile_image_id = db_row['ProfileImageID']
-        self.profile_pic = self.recipedb.get_image(self.profile_image_id)
+        if self.profile_image_id is not None:
+            self.profile_pic = self.recipedb.get_image(self.profile_image_id)
+        else:
+            self.profile_pic = None
 
     def set_display_name(self, display_name):
         raise NotImplementedError
