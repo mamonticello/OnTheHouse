@@ -1,5 +1,6 @@
 from . import constants
 from flask_login import UserMixin
+from . import helpers
 
 class ObjectBase:
     def __init__(self, recipedb):
@@ -69,12 +70,39 @@ class IngredientTag(ObjectBase):
         raise NotImplementedError
 
 
-class QuantitiedIngredient:
-    def __init__(self, ingredient, *, quantity=None, prefix=None, suffix=None):
+class QuantitiedIngredient(ObjectBase):
+    def __init__(self, recipedb, db_row):
+        super().__init__(recipedb)
+
+        if not db_row:
+            return
+
+        if isinstance(db_row, (list, tuple)):
+            db_row = dict(zip(constants.SQL_RECIPEINGREDIENT_COLUMNS, db_row))
+
+        self.ingredient = self.recipedb.get_ingredient(id=db_row['IngredientID'])
+        self.quantity = db_row['IngredientQuantity']
+        self.prefix = db_row['IngredientPrefix']
+        self.suffix = db_row['IngredientSuffix']
+
+    def __eq__(self, other):
+        return isinstance(other, QuantitiedIngredient) and self._identity == other._identity
+
+    def __hash__(self):
+        return hash(self._identity)
+
+    @property
+    def _identity(self):
+        return (self.ingredient.id, self.quantity, self.prefix, self.suffix)
+
+    @classmethod
+    def from_existing(cls, ingredient, *, quantity=None, prefix=None, suffix=None):
+        self = cls()
         self.ingredient = ingredient
         self.quantity = quantity
         self.prefix = prefix
         self.suffix = suffix
+        return self
 
 
 class Recipe(ObjectBase):
@@ -85,6 +113,7 @@ class Recipe(ObjectBase):
 
         self.id = db_row['RecipeID']
         self.name = db_row['Name']
+        self.slug = helpers.slugify(self.name)
         self.author_id = db_row['AuthorID']
         self.country = db_row['CountryOfOrigin']
         self.meal_type = db_row['MealType']
@@ -96,11 +125,15 @@ class Recipe(ObjectBase):
         self.serving_size = db_row['ServingSize']
         self.instructions = db_row['Instructions']
         self.recipe_image_id = db_row['RecipeImageID']
-        self.recipe_pic = self.photodb.get_image(self.recipe_image_id)
-
+        self.recipe_pic = self.recipedb.get_image(self.recipe_image_id)
 
     def get_ingredients(self):
-        raise NotImplementedError
+        cur = self.recipedb.sql.cursor()
+        cur.execute('SELECT * FROM Recipe_Ingredient_Map WHERE RecipeID = ?', [self.id])
+        lines = cur.fetchall()
+        ingredients = {QuantitiedIngredient(self.recipedb, line) for line in lines}
+
+        return ingredients
 
     def set_recipe_pic(self, image):
         raise NotImplementedError
@@ -159,10 +192,14 @@ class User(UserMixin, ObjectBase):
         self.id = db_row['UserID']
         self.username = db_row['Username']
         self.display_name = db_row['DisplayName']
+        self.password_hash = db_row['PasswordHash']
         self.bio_text = db_row['BioText']
         self.date_joined = db_row['DateJoined']
         self.profile_image_id = db_row['ProfileImageID']
-        self.profile_pic = self.photodb.get_image(self.profile_image_id)
+        if self.profile_image_id is not None:
+            self.profile_pic = self.recipedb.get_image(self.profile_image_id)
+        else:
+            self.profile_pic = None
 
     def set_display_name(self, display_name):
         raise NotImplementedError
