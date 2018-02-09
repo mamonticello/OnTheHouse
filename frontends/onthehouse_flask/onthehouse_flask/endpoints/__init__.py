@@ -1,11 +1,14 @@
 import flask; from flask import request
+from flask_login import LoginManager
 import random
+
 
 from . import common
 from . import recipe_endpoint
 from . import profile_endpoint
 
 site = common.site
+loginmanager = LoginManager(site)
 
 
 @site.route('/')
