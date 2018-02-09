@@ -248,8 +248,7 @@ class RecipeDB:
 
         cur = self.sql.cursor()
         (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_IMAGE_COLUMNS, data)
-        query = 'INSERT INTO Image VALUES(%s)'
-        qmarks
+        query = 'INSERT INTO Image VALUES(%s)' % qmarks
         cur.execute(query, bindings)
         self.sql.commit()
         image = objects.Image(self, data)
@@ -377,13 +376,33 @@ class RecipeDB:
             limit=None,
             meal_type=None,
             name=None,
-            rating=None,
-    ):
+        ):
         '''
         '''
         cur = self.sql.cursor()
 
         wheres = []
+        bindings = []
+
+        if author is not None:
+            wheres.append('AuthorID = ?')
+            bindings.append(author.id)
+
+        if country is not None:
+            wheres.append('Country = ?')
+            bindings.append(country)
+
+        if cuisine is not None:
+            wheres.append('Cuisine = ?')
+            bindings.append(cuisine)
+
+        if meal_type is not None:
+            wheres.append('MealType = ?')
+            bindings.append(meal_type)
+
+        if name is not None:
+            wheres.append('Name LIKE ?')
+            bindings.append(name)
 
         if wheres:
             wheres = ' AND '.join(wheres)
@@ -393,8 +412,11 @@ class RecipeDB:
 
         query = 'SELECT * FROM Recipe {wheres}'
         query = query.format(wheres=wheres)
+        self.log.debug(query)
+        self.log.debug(bindings)
+        cur.execute(query, bindings)
 
-        cur.execute(query)
+        results = []
         while True:
             recipe_row = cur.fetchone()
             if recipe_row is None:
@@ -402,6 +424,8 @@ class RecipeDB:
             recipe = objects.Recipe(self, recipe_row)
             # TESTS
             results.append(recipe)
+            if limit is not None and len(results) >= limit:
+                break
 
         return results
 
