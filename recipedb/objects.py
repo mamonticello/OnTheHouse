@@ -157,6 +157,7 @@ class User(ObjectBase):
         self.id = db_row['UserID']
         self.username = db_row['Username']
         self.display_name = db_row['DisplayName']
+        self.password_hash = db_row['PasswordHash']
         self.bio_text = db_row['BioText']
         self.date_joined = db_row['DateJoined']
         self.profile_image_id = db_row['ProfileImageID']
