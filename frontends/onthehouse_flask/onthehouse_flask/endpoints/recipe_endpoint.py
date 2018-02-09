@@ -27,5 +27,5 @@ def recipes_search():
         ingredients = ingredients.split('+')
         ingredients = [common.rdb.get_ingredient(name=ing) for ing in ingredients]
     results = common.rdb.search(ingredients=ingredients)
-    response = render_template("recipes.html", results=results)
+    response = render_template("recipes.html", recipes=results)
     return response
