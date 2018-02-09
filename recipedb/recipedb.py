@@ -1,3 +1,4 @@
+import bcrypt
 import copy
 import json
 import logging
@@ -72,7 +73,7 @@ class RecipeDB:
             exc = exceptions.DatabaseOutOfDate(
                 current=existing_version,
                 new=constants.DATABASE_VERSION,
-            )
+            )           
             raise exc
 
     def _first_time_setup(self):
@@ -386,3 +387,57 @@ class RecipeDB:
             results.append(recipe)
 
         return results
+    
+    def new_user(
+            self,
+            *,
+            username: str,
+            display_name: str,
+            password: str,
+            bio_text: str
+            profile_image: objects.Image
+        ):
+        '''
+        Register a new User to the database
+        '''
+        cur = self.sql.cursor()
+
+        user_id = helpers.random_hex()
+        password_hash = bcrypt.hashpw(password, bcrypt.gensalt())
+        date_joined = helpers.now()
+        profile_image_id = profile_image.id
+        profile_pic = profile_image.file_path
+
+        user_data = {
+            'UserID': user_id,
+            'Username': username,
+            'DisplayName': display_name,
+            'PasswordHash': password_hash,
+            'DateJoined': date_joined
+            'ProfileImageID': profile_image_id
+            'ProfilePic': profile_pic
+        }
+
+        (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_USER_COLUMNS, user_data)
+        query = 'INSERT INTO User VALUES(%s)' % qmarks
+        cur.execute(query, bindings)
+
+        self.sql.commit()
+
+        user = objects.User(self, user_data)
+        self.log.debug('Created user %s',user.username)
+        return user
+    
+    def get_user(self, id):
+        '''
+        Fetch an user by their ID
+        '''
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM User WHERE UserID = ?', [id])
+        user_row = cur.fetchone()
+        if user_row is not None:
+            user = objects.User(self, user_row)
+        else:
+            raise ValueError('User %s does not exist' % id)
+
+        return user
