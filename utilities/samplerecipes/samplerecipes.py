@@ -5,6 +5,29 @@ image_dir = pathclass.Path(__file__).parent.with_child('sample_images')
 
 rdb = recipedb.RecipeDB()
 
+angela = rdb.new_user(
+    username = "A",
+    display_name = "Angela",
+    password = "A",
+    bio_text = "Hello! This is a sample biography for Angela.",
+    profile_image = rdb.new_image(image_dir.with_child('angel_cake.jpg'))
+)
+
+bob = rdb.new_user(
+    username = "B",
+    display_name = "Bob",
+    password = "A",
+    bio_text = "Hello! This is a sample biography for Bob.",
+    profile_image = rdb.new_image(image_dir.with_child('homemade_pizza.jpg'))
+)
+
+caitlyn = rdb.new_user(
+    username = "C",
+    display_name = "Caitlyn",
+    password = "A",
+    bio_text = "Hello! This is a sample biography for Caitlyn.",
+    profile_image = rdb.new_image(image_dir.with_child('meringue.jpg'))
+)
 
 # 1
 instructions = '''
@@ -25,7 +48,7 @@ To serve, unmold on plate. Remove plastic wrap. Garnish with fresh basil, if
 desired. Serve with crackers.
 '''
 rdb.new_recipe(
-    author=None, #author="Better Homes and Gardens",
+    author=angela, #author="Better Homes and Gardens",
     blurb="This spread goes well with crackers or slided French bread.",
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -69,7 +92,7 @@ spatula, fold other half of omelet over vegetables. Gently slide out of pan onto
 plate. Serve immediately.
 '''
 rdb.new_recipe(
-    author=None, #author="Betty Crocker",
+    author=bob, #author="Betty Crocker",
     blurb=blurb,
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -116,7 +139,7 @@ pans. Cover with sauce, and desired toppings. Bake at 400 degrees for 20
 minutes, or until crust is golden brown.
 '''
 rdb.new_recipe(
-    author=None, #author="Mike",
+    author=caitlyn, #author="Mike",
     blurb=blurb,
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -179,7 +202,7 @@ Pour the chocolate into individual bowls or cups. Serve the warm churros with
 the chocolate dip.
 '''
 rdb.new_recipe(
-    author=None, #author="Food Network",
+    author=angela, #author="Food Network",
     blurb="Recipe courtesy of Chocolateria San Gines",
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -233,7 +256,7 @@ spatula or rice paddle until the rice reaches body temperature. Keep the rice
 covered with damp paper towels or napkin until the rice is ready to use.
 '''
 rdb.new_recipe(
-    author=None, #author="Food Network",
+    author=bob, #author="Food Network",
     blurb="Recipe courtesy of Jill Davie",
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -287,7 +310,7 @@ spatula or rice paddle until the rice reaches body temperature. Keep the rice
 covered with damp paper towels or napkin until the rice is ready to use.
 '''
 rdb.new_recipe(
-    author=None, #author="Food Network",
+    author=caitlyn, #author="Food Network",
     blurb="Recipe courtesy of Jill Davie",
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -337,7 +360,7 @@ Once the sauerkraut is finished, put a tight lid on the jar and move to cold
 storage. The sauerkraut's flavor will continue to develop as it ages.
 '''
 rdb.new_recipe(
-    author=None, #author="Cultures for Health",
+    author=angela, #author="Cultures for Health",
     blurb=blurb,
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -363,7 +386,7 @@ form. Transfer chilled egg mixture to a punch bowl. Fold in whipped cream
 mixture. Serve at once. Sprinkle each serving with nutmeg.
 '''
 rdb.new_recipe(
-    author=None, #author="Better Homes and Gardens",
+    author=bob, #author="Better Homes and Gardens",
     blurb="Always a hit at our annual staff Christmas party.",
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -402,7 +425,7 @@ Immediately invert cake (leave in pan); cook thoroughly. Loosen sides of cake
 from pan; remove cake.
 '''
 rdb.new_recipe(
-    author=None, #author="Better Homes and Gardens",
+    author=caitlyn, #author="Better Homes and Gardens",
     blurb="Eat your cake and diet, too. Angel Cake is low in calories and has no fat.",
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -434,7 +457,7 @@ Season with oregano, basil, salt, and pepper. Simmer spaghetti sauce for 1 hour,
 stirring occasionally.
 '''
 rdb.new_recipe(
-    author=None, #author="Hank's Mom",
+    author=angela, #author="Hank's Mom",
     blurb=blurb,
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -481,7 +504,7 @@ meringue over pie, sealing the edges at the crust.
 Bake in preheated oven for 10 minutes, or until meringue is golden brown.
 '''
 rdb.new_recipe(
-    author=None, #author="Emilie S.",
+    author=bob, #author="Emilie S.",
     blurb=blurb,
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -540,7 +563,7 @@ and then return the sandwich packets to the grill over indirect heat for 1 to
 Unwrap and serve immediately.
 '''
 rdb.new_recipe(
-    author=None, #author="Alton Brown",
+    author=caitlyn, #author="Alton Brown",
     blurb="This grilled cheese sandwich recipe actually grills the cheese.",
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -576,7 +599,7 @@ Using a potato masher or electric beater, slowly blend milk mixture into
 potatoes until smooth and creamy. Season with salt and pepper to taste.
 '''
 rdb.new_recipe(
-    author=None, #author="Esmee Williams",
+    author=angela, #author="Esmee Williams",
     blurb=blurb,
     country_of_origin="Unknown",
     cuisine="Unknown",
@@ -607,7 +630,7 @@ If sauce is too thick or curdles, immediately beat in 1 to 2 tablespoons hot
 tap water. Serve the sauce with cooked vegetables, pultry, fish, or eggs.
 '''
 rdb.new_recipe(
-    author=None, #author="Better Homes and Gardens",
+    author=bob, #author="Better Homes and Gardens",
     blurb="A classic creamy sauce with a rich lemon flavor.",
     country_of_origin="Unknown",
     cuisine="Unknown",
