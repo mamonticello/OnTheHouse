@@ -94,9 +94,16 @@ class Recipe(ObjectBase):
         self.blurb = db_row['Blurb']
         self.serving_size = db_row['ServingSize']
         self.instructions = db_row['Instructions']
+        self.recipe_image_id = db_row['RecipeImageID']
+        self.recipe_pic = self.photodb.get_image(self.recipe_image_id)
+
 
     def get_ingredients(self):
         raise NotImplementedError
+
+    def set_recipe_pic(self, image):
+        raise NotImplementedError
+        self.recipe_image_id = image.id
 
     def edit(
             self,

@@ -74,6 +74,8 @@ CREATE TABLE IF NOT EXISTS Recipe(
     Blurb TEXT,
     ServingSize INT,
     Instructions TEXT,
+    RecipeImageID TEXT,
+    FOREIGN KEY(RecipeImageID) REFERENCES Image(ImageID)
     FOREIGN KEY(AuthorID) REFERENCES User(UserID)
 );
 CREATE INDEX IF NOT EXISTS index_Recipe_RecipeID on Recipe(RecipeID);
