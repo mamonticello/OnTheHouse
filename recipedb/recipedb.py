@@ -428,7 +428,7 @@ class RecipeDB:
         self.log.debug('Created user %s',user.username)
         return user
     
-    def get_image(self, id):
+    def get_user(self, id):
         '''
         Fetch an user by their ID
         '''
