@@ -57,3 +57,25 @@ class DatabaseOutOfDate(RecipeDBException):
     Raised by RecipeDB __init__ if the user's database is behind.
     '''
     error_message = OUTOFDATE
+
+
+class NoSuch(RecipeDBException):
+    pass
+
+class NoSuchImage(NoSuch):
+    error_message = 'Image "{}" does not exist.'
+
+class NoSuchIngredient(NoSuch):
+    error_message = 'Ingredient "{}" does not exist.'
+
+class NoSuchIngredientTag(NoSuch):
+    error_message = 'IngredientTag "{}" does not exist.'
+
+class NoSuchRecipe(NoSuch):
+    error_message = 'Recipe "{}" does not exist.'
+
+class NoSuchReview(NoSuch):
+    error_message = 'Review "{}" does not exist.'
+
+class NoSuchUser(NoSuch):
+    error_message = 'User "{}" does not exist.'

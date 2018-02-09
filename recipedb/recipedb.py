@@ -1,9 +1,11 @@
+import bcrypt
 import copy
 import json
 import logging
 import os
 import sqlite3
 import tempfile
+import shutil
 
 from . import constants
 from . import exceptions
@@ -71,7 +73,7 @@ class RecipeDB:
             exc = exceptions.DatabaseOutOfDate(
                 current=existing_version,
                 new=constants.DATABASE_VERSION,
-            )
+            )           
             raise exc
 
     def _first_time_setup(self):
@@ -105,8 +107,48 @@ class RecipeDB:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
 
+    def _normalize_ingredient(ingredient):
+        '''
+        Try to convert the given input to a QuantitiedIngredient.
+        '''
+        if isinstance(ingredient, objects.QuantitiedIngredient):
+            return ingredient
+
+        if isinstance(ingredient, (tuple, list)):
+            (ingredient, quantity) = ingredient
+        else:
+            quantity = None
+
+        if isinstance(ingredient, str):
+            ingredient = self.get_or_create_ingredient(name=ingredient)
+
+        if isinstance(ingredient, objects.Ingredient):
+            ingredient = objects.QuantitiedIngredient(ingredient=ingredient, quantity=quantity)
+
+        if not isinstance(ingredient, objects.QuantitiedIngredient):
+            raise TypeError('Type not recognized', ingredient)
+
+        return ingredient
+
     def get_image(self, id):
-        raise NotImplementedError
+        '''
+        Fetch an image by its ID
+        '''
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM Image WHERE ImageID = ?', [id])
+        image_row = cur.fetchone()
+        if image_row is not None:
+            image = objects.Image(self, image_row)
+        else:
+            raise ValueError('Image %s does not exist' % id)
+
+        return image
+
+    def get_or_create_ingredient(self, name):
+        try:
+            return self.get_ingredient(name=name)
+        except exceptions.NoSuchIngredient:
+            return self.new_ingredient(name)
 
     def get_ingredient(
             self,
@@ -123,15 +165,18 @@ class RecipeDB:
         cur = self.sql.cursor()
         if id is not None:
             # fetch by ID
-            ingredient = NotImplemented
+            cur.execute('SELECT * FROM Ingredient WHERE IngredientID = ?', [id])
+            ingredient_row = cur.fetchone()
         else:
             # fetch by Name
             # make sure to check the autocorrect table first.
             cur.execute('SELECT * FROM Ingredient WHERE Name = ?', [name])
             ingredient_row = cur.fetchone()
-            if ingredient_row is None:
-                raise ValueError(ingredient_row)
-            ingredient = objects.Ingredient(self, ingredient_row)
+
+        if ingredient_row is None:
+            raise exceptions.NoSuchIngredient(id or ingredient)
+
+        ingredient = objects.Ingredient(self, ingredient_row)
 
         return ingredient
 
@@ -185,9 +230,24 @@ class RecipeDB:
     def new_image(self, filepath):
         '''
         Register a new image in the database.
-        This assumes that the filepath is already in the correct location.
         '''
-        raise NotImplementedError
+        #generate id and generate new filepath based on id
+        id = helpers.random_hex()
+        filetype = filepath.rsplit('.',1)[1]
+        new_filepath = '\\'.join(id[i:i+4] for i in range(0, len(id), 4)) + '.' + filetype
+        shutil.copyfile(filepath,new_filepath)
+        data = {
+            'ImageID': id,
+            'ImageFilePath': new_filepath,
+        }
+
+        (qmarks,bindings) = sqlhelpers.insert_filler(constants.SQL_IMAGE_COLUMNS, data)
+        query = 'INSERT INTO Image VALUES(%s)' qmarks
+        cur.execute(query,bindings)
+        self.sql.commit()
+        image = objects.Image(self, data)
+        self.log.debug('Created image with ID: %s, filepath: %s' % (image.id,image.file_path))
+        return image
 
     def new_ingredient(self, name):
         '''
@@ -234,7 +294,7 @@ class RecipeDB:
             name: str,
             prep_time: int,
             serving_size: int,
-            recipe_image: objects.image,
+            recipe_image: objects.Image,
         ):
         '''
         Add a new recipe to the database.
@@ -261,34 +321,22 @@ class RecipeDB:
             'Blurb': blurb,
             'ServingSize': serving_size,
             'Instructions': instructions,
-            'RecipeID': recipe_image
+            'RecipeImageID': recipe_image,
         }
 
         (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_RECIPE_COLUMNS, recipe_data)
         query = 'INSERT INTO Recipe VALUES(%s)' % qmarks
         cur.execute(query, bindings)
 
-        def _normalize_ingredient(ingredient):
-            # Not worrying about quantities for now.
-            if isinstance(ingredient, str):
-                try:
-                    ingredient = self.get_ingredient(name=ingredient)
-                except Exception:
-                    ingredient = self.new_ingredient(ingredient)
-            elif isinstance(ingredient, objects.Ingredient):
-                pass
-            else:
-                raise TypeError('Type not recognized', ingredient)
-            return ingredient
-        ingredients = [_normalize_ingredient(ingredient) for ingredient in ingredients]
+        ingredients = [self._normalize_ingredient(ingredient) for ingredient in ingredients]
 
         for ingredient in ingredients:
             recipe_ingredient_data = {
                 'RecipeID': recipe_id,
                 'IngredientID': ingredient.id,
-                'IngredientQuantity': None,
-                'IngredientPrefix': None,
-                'IngredientSuffix': None,
+                'IngredientQuantity': ingredient.quantity,
+                'IngredientPrefix': ingredient.prefix,
+                'IngredientSuffix': ingredient.suffix,
             }
             (qmarks, bindings) = sqlhelpers.insert_filler(
                 constants.SQL_RECIPEINGREDIENT_COLUMNS,
@@ -302,3 +350,96 @@ class RecipeDB:
         recipe = objects.Recipe(self, recipe_data)
         self.log.debug('Created recipe %s', recipe.name)
         return recipe
+
+    def search(
+            self,
+            *,
+            author=None,
+            country=None,
+            cuisine=None,
+            ingredients=None,
+            ingredients_exclude=None,
+            limit=None,
+            meal_type=None,
+            name=None,
+            rating=None,
+        ):
+        '''
+        '''
+        cur = self.sql.cursor()
+
+        wheres = []
+
+        if wheres:
+            wheres = ' AND '.join(wheres)
+            wheres = 'WHERE ' + wheres
+        else:
+            wheres = ''
+
+        query = 'SELECT * FROM Recipe {wheres}'
+        query = query.format(wheres=wheres)
+
+        cur.execute(query)
+        while True:
+            recipe_row = cur.fetchone()
+            if recipe_row is None:
+                break
+            recipe = objects.Recipe(self, recipe_row)
+            # TESTS
+            results.append(recipe)
+
+        return results
+    
+    def new_user(
+            self,
+            *,
+            username: str,
+            display_name: str,
+            password: str,
+            bio_text: str
+            profile_image: objects.Image
+        ):
+        '''
+        Register a new User to the database
+        '''
+        cur = self.sql.cursor()
+
+        user_id = helpers.random_hex()
+        password_hash = bcrypt.hashpw(password, bcrypt.gensalt())
+        date_joined = helpers.now()
+        profile_image_id = profile_image.id
+        profile_pic = profile_image.file_path
+
+        user_data = {
+            'UserID': user_id,
+            'Username': username,
+            'DisplayName': display_name,
+            'PasswordHash': password_hash,
+            'DateJoined': date_joined
+            'ProfileImageID': profile_image_id
+            'ProfilePic': profile_pic
+        }
+
+        (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_USER_COLUMNS, user_data)
+        query = 'INSERT INTO User VALUES(%s)' % qmarks
+        cur.execute(query, bindings)
+
+        self.sql.commit()
+
+        user = objects.User(self, user_data)
+        self.log.debug('Created user %s',user.username)
+        return user
+    
+    def get_user(self, id):
+        '''
+        Fetch an user by their ID
+        '''
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM User WHERE UserID = ?', [id])
+        user_row = cur.fetchone()
+        if user_row is not None:
+            user = objects.User(self, user_row)
+        else:
+            raise ValueError('User %s does not exist' % id)
+
+        return user
