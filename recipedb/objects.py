@@ -118,9 +118,13 @@ class Recipe(ObjectBase):
         self.recipe_image_id = db_row['RecipeImageID']
         self.recipe_pic = self.recipedb.get_image(self.recipe_image_id)
 
-
     def get_ingredients(self):
-        raise NotImplementedError
+        cur = self.recipedb.sql.cursor()
+        cur.execute('SELECT * FROM Recipe_Ingredient_Map WHERE RecipeID = ?', [self.id])
+        lines = cur.fetchall()
+        ingredients = {QuantitiedIngredient(self.recipedb, line) for line in lines}
+
+        return ingredients
 
     def set_recipe_pic(self, image):
         raise NotImplementedError
