@@ -68,12 +68,33 @@ class IngredientTag(ObjectBase):
         raise NotImplementedError
 
 
-class QuantitiedIngredient:
-    def __init__(self, ingredient, *, quantity=None, prefix=None, suffix=None):
+class QuantitiedIngredient(ObjectBase):
+    def __init__(self, recipedb, db_row):
+        super().__init__(recipedb)
+
+        if not db_row:
+            return
+
+        if isinstance(db_row, (list, tuple)):
+            db_row = dict(zip(constants.SQL_RECIPEINGREDIENT_COLUMNS, db_row))
+
+        self.ingredient = self.recipedb.get_ingredient(id=db_row['IngredientID'])
+        self.quantity = db_row['IngredientQuantity']
+        self.prefix = db_row['IngredientPrefix']
+        self.suffix = db_row['IngredientSuffix']
+
+    def __hash__(self):
+        identity = (self.ingredient.id, self.quantity, self.prefix, self.suffix)
+        return hash(identity)
+
+    @classmethod
+    def from_existing(cls, ingredient, *, quantity=None, prefix=None, suffix=None):
+        self = cls()
         self.ingredient = ingredient
         self.quantity = quantity
         self.prefix = prefix
         self.suffix = suffix
+        return self
 
 
 class Recipe(ObjectBase):

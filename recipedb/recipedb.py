@@ -122,7 +122,10 @@ class RecipeDB:
             ingredient = self.get_or_create_ingredient(name=ingredient)
 
         if isinstance(ingredient, objects.Ingredient):
-            ingredient = objects.QuantitiedIngredient(ingredient=ingredient, quantity=quantity)
+            ingredient = objects.QuantitiedIngredient.from_existing(
+                ingredient=ingredient,
+                quantity=quantity,
+            )
 
         if not isinstance(ingredient, objects.QuantitiedIngredient):
             raise TypeError('Type not recognized', ingredient)
