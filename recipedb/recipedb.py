@@ -442,12 +442,13 @@ class RecipeDB:
             if recipe_ingredients.intersection(ingredients_exclude):
                 continue
 
-            if strict_ingredients:
-                if not recipe_ingredients.issubset(ingredients):
-                    continue
-            else:
-                if not recipe_ingredients.intersection(ingredients):
-                    continue
+            if ingredients:
+                if strict_ingredients:
+                    if not recipe_ingredients.issubset(ingredients):
+                        continue
+                else:
+                    if not recipe_ingredients.intersection(ingredients):
+                        continue
 
             results.append(recipe)
             if limit is not None and len(results) >= limit:
