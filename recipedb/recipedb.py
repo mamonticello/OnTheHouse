@@ -452,5 +452,5 @@ class RecipeDB:
         '''
         Check a typed password against the user's password
         '''
-        user = get_user(id)
+        user = get_user(user_id)
         return bcrypt.checkpw(password, user.password_hash)
