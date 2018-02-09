@@ -5,6 +5,7 @@ but don't belong to any one class in particular.
 import datetime
 import math
 import os
+import string
 import unicodedata
 
 from . import constants
@@ -113,3 +114,25 @@ def remove_path_badchars(filepath, allowed=''):
     filepath = filepath.replace('/', os.sep)
     filepath = filepath.replace('\\', os.sep)
     return filepath
+
+def slugify(text, maxlen=24):
+    text = text.lower()
+    text = text.strip().replace(' ', '-')
+    allowed_chars = string.ascii_letters + string.digits + '-'
+    text = ''.join(c for c in text if c in allowed_chars)
+    words = text.split('-')
+
+    if len(words) == 0:
+        return ''
+
+    while True:
+        slug = '-'.join(words)
+        if len(slug) > maxlen:
+            if len(words) == 1:
+                slug = slug[:maxlen]
+                break
+            else:
+                words = words[:-1]
+        else:
+            break
+    return slug
