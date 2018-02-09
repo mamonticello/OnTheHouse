@@ -426,6 +426,7 @@ class RecipeDB:
             'Username': username,
             'DisplayName': display_name,
             'PasswordHash': password_hash,
+            'BioText': bio_text,
             'DateJoined': date_joined,
             'ProfileImageID': profile_image_id,
         }
