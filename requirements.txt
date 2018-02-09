@@ -3,3 +3,4 @@ flask
 gevent
 voussoirkit>=0.0.19
 Flask-Login
+WTForms
