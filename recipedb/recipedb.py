@@ -443,3 +443,14 @@ class RecipeDB:
             raise ValueError('User %s does not exist' % id)
 
         return user
+    
+    def check_password(self,
+                       *,
+                       user_id: int,
+                       password: str
+                      ):
+        '''
+        Check a typed password against the user's password
+        '''
+        user = get_user(id)
+        return bcrypt.checkpw(password, user.password_hash)
