@@ -115,6 +115,10 @@ class Recipe(ObjectBase):
         self.name = db_row['Name']
         self.slug = helpers.slugify(self.name)
         self.author_id = db_row['AuthorID']
+        if self.author_id is not None:
+            self.author = self.recipedb.get_user(id=self.author_id)
+        else:
+            self.author = None
         self.country = db_row['CountryOfOrigin']
         self.meal_type = db_row['MealType']
         self.cuisine = db_row['Cuisine']

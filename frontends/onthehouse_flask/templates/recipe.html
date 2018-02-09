@@ -58,14 +58,13 @@
 	<div class="col-sm-9">
         <div class="row content">
             <div class="col-sm-12">
-                <h2 class="recipe-name">Name = {{ recipe.name }}</h2>
-                <h3 class="recipe-id">Recipe ID = {{ recipe.id}} </h3>
-                <h3 class="recipe-country">Country Of Origin = {{ recipe.country}} </h3>
+                <h2 class="recipe-name">{{ recipe.name }}</h2>
+                <p><img src="/image/{{recipe.recipe_image_id}}"/></p>
                 <h3 class="recipe-meal-type">Meal Type = {{ recipe.meal_type}} </h3>
-                <h3 class="recipe-cuisine">Cuisine = {{ recipe.cuisine}} </h3>
+                {% if recipe.author is not none %}
+                <h3 class="recipe-author">Author: <a href="/user/{{recipe.author.username}}">{{recipe.author.display_name}}</a></h3>
+                {% endif %}
                 <h3 class="recipe-prep-time">Prep Time = {{ recipe.prep_time}} </h3>
-                <h3 class="recipe-date-added">Date Added = {{ recipe.date_added}} </h3>
-                <h3 class="recipe-date-mod">Date Modified = {{ recipe.date_mod}} </h3>
                 <h3 class="recipe-blurb">blurb = {{ recipe.blurb}} </h3>
                 <h3 class="recipe-servings">serving_size = {{ recipe.serving_size}} </h3>
                 <h3 class="recipe-instructions">instructions = {{ recipe.instructions}} </h3>
