@@ -29,6 +29,14 @@ caitlyn = rdb.new_user(
     profile_image = rdb.new_image(image_dir.with_child('meringue.jpg'))
 )
 
+anonymous = rdb.new_user(
+    username='anon',
+    display_name='Rainbowman',
+    password='A',
+    bio_text='You cant touch me.',
+    profile_image=None,
+)
+
 # 1
 instructions = '''
 Soften cream cheese and Brie cheese.
