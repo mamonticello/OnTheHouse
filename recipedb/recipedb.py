@@ -232,15 +232,22 @@ class RecipeDB:
         Register a new image in the database.
         '''
         #generate id and generate new filepath based on id
+        if isinstance(filepath, pathclass.Path):
+            filepath = filepath.absolute_path
+
         id = helpers.random_hex()
         filetype = filepath.rsplit('.',1)[1]
         new_filepath = '\\'.join(id[i:i+4] for i in range(0, len(id), 4)) + '.' + filetype
-        shutil.copyfile(filepath,new_filepath)
+        new_filepath = self.image_directory.join(new_filepath)
+        os.makedirs(new_filepath.parent.absolute_path, exist_ok=True)
+        new_filepath = new_filepath.absolute_path
+        shutil.copyfile(filepath, new_filepath)
         data = {
             'ImageID': id,
             'ImageFilePath': new_filepath,
         }
 
+        cur = self.sql.cursor()
         (qmarks,bindings) = sqlhelpers.insert_filler(constants.SQL_IMAGE_COLUMNS, data)
         query = 'INSERT INTO Image VALUES(%s)' qmarks
         cur.execute(query,bindings)
@@ -338,13 +345,13 @@ class RecipeDB:
 
         ingredients = [self._normalize_ingredient(ingredient) for ingredient in ingredients]
 
-        for ingredient in ingredients:
+        for quant_ingredient in ingredients:
             recipe_ingredient_data = {
                 'RecipeID': recipe_id,
-                'IngredientID': ingredient.id,
-                'IngredientQuantity': ingredient.quantity,
-                'IngredientPrefix': ingredient.prefix,
-                'IngredientSuffix': ingredient.suffix,
+                'IngredientID': quant_ingredient.ingredient.id,
+                'IngredientQuantity': quant_ingredient.quantity,
+                'IngredientPrefix': quant_ingredient.prefix,
+                'IngredientSuffix': quant_ingredient.suffix,
             }
             (qmarks, bindings) = sqlhelpers.insert_filler(
                 constants.SQL_RECIPEINGREDIENT_COLUMNS,
