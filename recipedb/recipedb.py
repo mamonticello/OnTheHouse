@@ -122,7 +122,10 @@ class RecipeDB:
             ingredient = self.get_or_create_ingredient(name=ingredient)
 
         if isinstance(ingredient, objects.Ingredient):
-            ingredient = objects.QuantitiedIngredient(ingredient=ingredient, quantity=quantity)
+            ingredient = objects.QuantitiedIngredient.from_existing(
+                ingredient=ingredient,
+                quantity=quantity,
+            )
 
         if not isinstance(ingredient, objects.QuantitiedIngredient):
             raise TypeError('Type not recognized', ingredient)
@@ -154,7 +157,7 @@ class RecipeDB:
             *,
             id=None,
             name=None,
-    ):
+        ):
         '''
         Fetch a single Ingredient by its ID or name.
         '''
@@ -248,8 +251,7 @@ class RecipeDB:
 
         cur = self.sql.cursor()
         (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_IMAGE_COLUMNS, data)
-        query = 'INSERT INTO Image VALUES(%s)'
-        qmarks
+        query = 'INSERT INTO Image VALUES(%s)' % qmarks
         cur.execute(query, bindings)
         self.sql.commit()
         image = objects.Image(self, data)
@@ -377,13 +379,44 @@ class RecipeDB:
             limit=None,
             meal_type=None,
             name=None,
-            rating=None,
-    ):
+            strict_ingredients=False,
+        ):
         '''
         '''
         cur = self.sql.cursor()
 
         wheres = []
+        bindings = []
+
+        if author is not None:
+            wheres.append('AuthorID = ?')
+            bindings.append(author.id)
+
+        if country is not None:
+            wheres.append('Country = ?')
+            bindings.append(country)
+
+        if cuisine is not None:
+            wheres.append('Cuisine = ?')
+            bindings.append(cuisine)
+
+        if ingredients is None:
+            ingredients = set()
+        else:
+            ingredients = set(ingredients)
+
+        if ingredients_exclude is None:
+            ingredients_exclude = set()
+        else:
+            ingredients_exclude = set(ingredients_exclude)
+
+        if meal_type is not None:
+            wheres.append('MealType = ?')
+            bindings.append(meal_type)
+
+        if name is not None:
+            wheres.append('Name LIKE ?')
+            bindings.append(name)
 
         if wheres:
             wheres = ' AND '.join(wheres)
@@ -393,15 +426,32 @@ class RecipeDB:
 
         query = 'SELECT * FROM Recipe {wheres}'
         query = query.format(wheres=wheres)
+        self.log.debug(query)
+        self.log.debug(bindings)
+        cur.execute(query, bindings)
 
-        cur.execute(query)
+        results = []
         while True:
             recipe_row = cur.fetchone()
             if recipe_row is None:
                 break
             recipe = objects.Recipe(self, recipe_row)
-            # TESTS
+
+            recipe_ingredients = {qi.ingredient for qi in recipe.get_ingredients()}
+
+            if recipe_ingredients.intersection(ingredients_exclude):
+                continue
+
+            if strict_ingredients:
+                if not recipe_ingredients.issubset(ingredients):
+                    continue
+            else:
+                if not recipe_ingredients.intersection(ingredients):
+                    continue
+
             results.append(recipe)
+            if limit is not None and len(results) >= limit:
+                break
 
         return results
 

@@ -68,12 +68,39 @@ class IngredientTag(ObjectBase):
         raise NotImplementedError
 
 
-class QuantitiedIngredient:
-    def __init__(self, ingredient, *, quantity=None, prefix=None, suffix=None):
+class QuantitiedIngredient(ObjectBase):
+    def __init__(self, recipedb, db_row):
+        super().__init__(recipedb)
+
+        if not db_row:
+            return
+
+        if isinstance(db_row, (list, tuple)):
+            db_row = dict(zip(constants.SQL_RECIPEINGREDIENT_COLUMNS, db_row))
+
+        self.ingredient = self.recipedb.get_ingredient(id=db_row['IngredientID'])
+        self.quantity = db_row['IngredientQuantity']
+        self.prefix = db_row['IngredientPrefix']
+        self.suffix = db_row['IngredientSuffix']
+
+    def __eq__(self, other):
+        return isinstance(other, QuantitiedIngredient) and self._identity == other._identity
+
+    def __hash__(self):
+        return hash(self._identity)
+
+    @property
+    def _identity(self):
+        return (self.ingredient.id, self.quantity, self.prefix, self.suffix)
+
+    @classmethod
+    def from_existing(cls, ingredient, *, quantity=None, prefix=None, suffix=None):
+        self = cls()
         self.ingredient = ingredient
         self.quantity = quantity
         self.prefix = prefix
         self.suffix = suffix
+        return self
 
 
 class Recipe(ObjectBase):
@@ -97,9 +124,13 @@ class Recipe(ObjectBase):
         self.recipe_image_id = db_row['RecipeImageID']
         self.recipe_pic = self.recipedb.get_image(self.recipe_image_id)
 
-
     def get_ingredients(self):
-        raise NotImplementedError
+        cur = self.recipedb.sql.cursor()
+        cur.execute('SELECT * FROM Recipe_Ingredient_Map WHERE RecipeID = ?', [self.id])
+        lines = cur.fetchall()
+        ingredients = {QuantitiedIngredient(self.recipedb, line) for line in lines}
+
+        return ingredients
 
     def set_recipe_pic(self, image):
         raise NotImplementedError
