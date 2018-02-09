@@ -15,7 +15,6 @@ from . import objects
 from voussoirkit import pathclass
 from voussoirkit import sqlhelpers
 
-
 logging.basicConfig()
 
 
@@ -23,7 +22,7 @@ class RecipeDB:
     def __init__(
             self,
             data_directory=None,
-        ):
+    ):
         super().__init__()
 
         if data_directory is None:
@@ -73,7 +72,7 @@ class RecipeDB:
             exc = exceptions.DatabaseOutOfDate(
                 current=existing_version,
                 new=constants.DATABASE_VERSION,
-            )           
+            )
             raise exc
 
     def _first_time_setup(self):
@@ -107,7 +106,7 @@ class RecipeDB:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
 
-    def _normalize_ingredient(ingredient):
+    def _normalize_ingredient(self, ingredient):
         '''
         Try to convert the given input to a QuantitiedIngredient.
         '''
@@ -155,7 +154,7 @@ class RecipeDB:
             *,
             id=None,
             name=None,
-        ):
+    ):
         '''
         Fetch a single Ingredient by its ID or name.
         '''
@@ -174,7 +173,7 @@ class RecipeDB:
             ingredient_row = cur.fetchone()
 
         if ingredient_row is None:
-            raise exceptions.NoSuchIngredient(id or ingredient)
+            raise exceptions.NoSuchIngredient(id or name)
 
         ingredient = objects.Ingredient(self, ingredient_row)
 
@@ -185,7 +184,7 @@ class RecipeDB:
             *,
             id=None,
             name=None,
-        ):
+    ):
         '''
         Fetch a single IngredientTag by its ID or name.
         '''
@@ -231,13 +230,13 @@ class RecipeDB:
         '''
         Register a new image in the database.
         '''
-        #generate id and generate new filepath based on id
+        # generate id and generate new filepath based on id
         if isinstance(filepath, pathclass.Path):
             filepath = filepath.absolute_path
 
         id = helpers.random_hex()
-        filetype = filepath.rsplit('.',1)[1]
-        new_filepath = '\\'.join(id[i:i+4] for i in range(0, len(id), 4)) + '.' + filetype
+        filetype = filepath.rsplit('.', 1)[1]
+        new_filepath = '\\'.join(id[i:i + 4] for i in range(0, len(id), 4)) + '.' + filetype
         new_filepath = self.image_directory.join(new_filepath)
         os.makedirs(new_filepath.parent.absolute_path, exist_ok=True)
         new_filepath = new_filepath.absolute_path
@@ -248,12 +247,13 @@ class RecipeDB:
         }
 
         cur = self.sql.cursor()
-        (qmarks,bindings) = sqlhelpers.insert_filler(constants.SQL_IMAGE_COLUMNS, data)
-        query = 'INSERT INTO Image VALUES(%s)' qmarks
-        cur.execute(query,bindings)
+        (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_IMAGE_COLUMNS, data)
+        query = 'INSERT INTO Image VALUES(%s)'
+        qmarks
+        cur.execute(query, bindings)
         self.sql.commit()
         image = objects.Image(self, data)
-        self.log.debug('Created image with ID: %s, filepath: %s' % (image.id,image.file_path))
+        self.log.debug('Created image with ID: %s, filepath: %s' % (image.id, image.file_path))
         return image
 
     def new_ingredient(self, name):
@@ -302,7 +302,7 @@ class RecipeDB:
             prep_time: int,
             serving_size: int,
             recipe_image: objects.Image,
-        ):
+    ):
         '''
         Add a new recipe to the database.
 
@@ -378,7 +378,7 @@ class RecipeDB:
             meal_type=None,
             name=None,
             rating=None,
-        ):
+    ):
         '''
         '''
         cur = self.sql.cursor()
@@ -404,7 +404,7 @@ class RecipeDB:
             results.append(recipe)
 
         return results
-    
+
     def new_user(
             self,
             *,
@@ -413,7 +413,7 @@ class RecipeDB:
             password: str,
             bio_text: str,
             profile_image: objects.Image
-        ):
+    ):
         '''
         Register a new User to the database
         '''
@@ -445,9 +445,9 @@ class RecipeDB:
         self.sql.commit()
 
         user = objects.User(self, user_data)
-        self.log.debug('Created user %s',user.username)
+        self.log.debug('Created user %s', user.username)
         return user
-    
+
     def get_user(self, id):
         '''
         Fetch an user by their ID
@@ -461,12 +461,12 @@ class RecipeDB:
             raise ValueError('User %s does not exist' % id)
 
         return user
-    
+
     def check_password(self,
                        *,
                        user_id: str,
                        password: str
-                      ):
+                       ):
         '''
         Check a typed password against the user's password
         '''
