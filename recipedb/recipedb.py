@@ -321,7 +321,7 @@ class RecipeDB:
             'Blurb': blurb,
             'ServingSize': serving_size,
             'Instructions': instructions,
-            'RecipeImageID': recipe_image,
+            'RecipeImageID': recipe_image.id,
         }
 
         (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_RECIPE_COLUMNS, recipe_data)
