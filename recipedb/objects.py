@@ -1,4 +1,5 @@
 from . import constants
+from flask_login import UserMixin
 
 class ObjectBase:
     def __init__(self, recipedb):
@@ -148,7 +149,8 @@ class Review(ObjectBase):
         raise NotImplementedError
 
 
-class User(ObjectBase):
+#class User(ObjectBase):
+class User(UserMixin, ObjectBase):
     def __init__(self, recipedb, db_row):
         super().__init__(recipedb)
         if isinstance(db_row, (list, tuple)):
