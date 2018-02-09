@@ -107,7 +107,7 @@ class RecipeDB:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
 
-    def _normalize_ingredient(ingredient):
+    def _normalize_ingredient(self, ingredient):
         '''
         Try to convert the given input to a QuantitiedIngredient.
         '''
@@ -174,7 +174,7 @@ class RecipeDB:
             ingredient_row = cur.fetchone()
 
         if ingredient_row is None:
-            raise exceptions.NoSuchIngredient(id or ingredient)
+            raise exceptions.NoSuchIngredient(id or name)
 
         ingredient = objects.Ingredient(self, ingredient_row)
 
@@ -242,7 +242,8 @@ class RecipeDB:
         }
 
         (qmarks,bindings) = sqlhelpers.insert_filler(constants.SQL_IMAGE_COLUMNS, data)
-        query = 'INSERT INTO Image VALUES(%s)' qmarks
+        query = 'INSERT INTO Image VALUES(%s)'%qmarks
+        cur = self.sql.cursor()
         cur.execute(query,bindings)
         self.sql.commit()
         image = objects.Image(self, data)
@@ -386,7 +387,7 @@ class RecipeDB:
                 break
             recipe = objects.Recipe(self, recipe_row)
             # TESTS
-            results.append(recipe)
+            # results.append(recipe)
 
         return results
     
