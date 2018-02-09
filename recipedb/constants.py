@@ -63,11 +63,11 @@ CREATE INDEX IF NOT EXISTS index_IngredientIngredientTagMap_IngredientID on Ingr
 ----------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS Recipe(
     RecipeID TEXT PRIMARY KEY,
-    Name TEXT,
+    Name TEXT COLLATE NOCASE,
     AuthorID TEXT,
-    CountryOfOrigin TEXT,
-    MealType TEXT,
-    Cuisine TEXT,
+    CountryOfOrigin TEXT COLLATE NOCASE,
+    MealType TEXT COLLATE NOCASE,
+    Cuisine TEXT COLLATE NOCASE,
     PrepTime INT,
     DateAdded INT,
     DateModified INT,
