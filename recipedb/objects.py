@@ -95,7 +95,7 @@ class Recipe(ObjectBase):
         self.serving_size = db_row['ServingSize']
         self.instructions = db_row['Instructions']
         self.recipe_image_id = db_row['RecipeImageID']
-        self.recipe_pic = self.photodb.get_image(self.recipe_image_id)
+        self.recipe_pic = self.recipedb.get_image(self.recipe_image_id)
 
 
     def get_ingredients(self):
@@ -161,7 +161,7 @@ class User(ObjectBase):
         self.bio_text = db_row['BioText']
         self.date_joined = db_row['DateJoined']
         self.profile_image_id = db_row['ProfileImageID']
-        self.profile_pic = self.photodb.get_image(self.profile_image_id)
+        self.profile_pic = self.recipedb.get_image(self.profile_image_id)
 
     def set_display_name(self, display_name):
         raise NotImplementedError
