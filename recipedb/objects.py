@@ -83,9 +83,15 @@ class QuantitiedIngredient(ObjectBase):
         self.prefix = db_row['IngredientPrefix']
         self.suffix = db_row['IngredientSuffix']
 
+    def __eq__(self, other):
+        return isinstance(other, QuantitiedIngredient) and self._identity == other._identity
+
     def __hash__(self):
-        identity = (self.ingredient.id, self.quantity, self.prefix, self.suffix)
-        return hash(identity)
+        return hash(self._identity)
+
+    @property
+    def _identity(self):
+        return (self.ingredient.id, self.quantity, self.prefix, self.suffix)
 
     @classmethod
     def from_existing(cls, ingredient, *, quantity=None, prefix=None, suffix=None):

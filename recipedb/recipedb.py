@@ -157,7 +157,7 @@ class RecipeDB:
             *,
             id=None,
             name=None,
-    ):
+        ):
         '''
         Fetch a single Ingredient by its ID or name.
         '''
@@ -379,6 +379,7 @@ class RecipeDB:
             limit=None,
             meal_type=None,
             name=None,
+            strict_ingredients=False,
         ):
         '''
         '''
@@ -398,6 +399,16 @@ class RecipeDB:
         if cuisine is not None:
             wheres.append('Cuisine = ?')
             bindings.append(cuisine)
+
+        if ingredients is None:
+            ingredients = set()
+        else:
+            ingredients = set(ingredients)
+
+        if ingredients_exclude is None:
+            ingredients_exclude = set()
+        else:
+            ingredients_exclude = set(ingredients_exclude)
 
         if meal_type is not None:
             wheres.append('MealType = ?')
@@ -425,7 +436,19 @@ class RecipeDB:
             if recipe_row is None:
                 break
             recipe = objects.Recipe(self, recipe_row)
-            # TESTS
+
+            recipe_ingredients = {qi.ingredient for qi in recipe.get_ingredients()}
+
+            if recipe_ingredients.intersection(ingredients_exclude):
+                continue
+
+            if strict_ingredients:
+                if not recipe_ingredients.issubset(ingredients):
+                    continue
+            else:
+                if not recipe_ingredients.intersection(ingredients):
+                    continue
+
             results.append(recipe)
             if limit is not None and len(results) >= limit:
                 break
