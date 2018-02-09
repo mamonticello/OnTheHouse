@@ -496,7 +496,7 @@ class RecipeDB:
         self.sql.commit()
 
         user = objects.User(self, user_data)
-        self.log.debug('Created user %s with ID %s', (user.username, user.id))
+        self.log.debug('Created user %s with ID %s', user.username, user.id)
         return user
 
     def get_user(self, *, id=None, username=None):
