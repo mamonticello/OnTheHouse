@@ -132,6 +132,14 @@ class RecipeDB:
 
         return ingredient
 
+    def _normalize_ingredient_name(self, name):
+        '''
+        Apply any normalization rules that bring multiple equivalent forms
+        of an ingredient name to a single, consistent form.
+        '''
+        name = name.replace('_', ' ')
+        return name
+
     def get_image(self, id):
         '''
         Fetch an image by its ID
@@ -172,6 +180,7 @@ class RecipeDB:
         else:
             # fetch by Name
             # make sure to check the autocorrect table first.
+            name = self._normalize_ingredient_name(name)
             cur.execute('SELECT * FROM Ingredient WHERE Name = ?', [name])
             ingredient_row = cur.fetchone()
 
@@ -187,7 +196,7 @@ class RecipeDB:
             *,
             id=None,
             name=None,
-    ):
+        ):
         '''
         Fetch a single IngredientTag by its ID or name.
         '''
@@ -264,6 +273,7 @@ class RecipeDB:
         '''
         # Check if this name is already taken by the autocorrect or other ing.
         # - if so, raise an exception.
+        name = self._normalize_ingredient_name(name)
         cur = self.sql.cursor()
         cur.execute('SELECT * FROM Ingredient WHERE name = ?', [name])
         ingredient_row = cur.fetchone()
