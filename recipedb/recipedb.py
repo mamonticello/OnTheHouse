@@ -106,7 +106,7 @@ class RecipeDB:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
 
-    def _normalize_ingredient(self, ingredient):
+    def _coerce_quantitied_ingredient(self, ingredient):
         '''
         Try to convert the given input to a QuantitiedIngredient.
         '''
@@ -345,7 +345,7 @@ class RecipeDB:
         query = 'INSERT INTO Recipe VALUES(%s)' % qmarks
         cur.execute(query, bindings)
 
-        ingredients = [self._normalize_ingredient(ingredient) for ingredient in ingredients]
+        ingredients = [self._coerce_quantitied_ingredient(ingredient) for ingredient in ingredients]
 
         for quant_ingredient in ingredients:
             recipe_ingredient_data = {
