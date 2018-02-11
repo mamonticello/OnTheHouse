@@ -69,6 +69,19 @@
                 <h3 class="recipe-prep-time">Prep Time = {{ recipe.prep_time}} </h3>
                 <h3 class="recipe-blurb">blurb = {{ recipe.blurb}} </h3>
                 <h3 class="recipe-servings">serving_size = {{ recipe.serving_size}} </h3>
+                <h3 class="recipe-ingredients">Ingredients:</h3>
+                {% set ingredients = recipe.get_ingredients() %}
+                {% if ingredients|length > 0 %}
+                <ul>
+                  {% for quantitied in ingredients %}
+                    <li>
+                      <a href="/recipe/search?ingredients={{quantitied.ingredient.name.replace(' ', '_')}}">
+                        {{-quantitied.quantity or ""-}} {{-quantitied.prefix or ""-}} {{-quantitied.ingredient.name-}} {{-quantitied.suffix or ""-}}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
                 <h3 class="recipe-instructions">instructions = {{ recipe.instructions}} </h3>
             </div>
         </div>

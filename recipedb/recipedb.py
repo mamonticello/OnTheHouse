@@ -106,7 +106,7 @@ class RecipeDB:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
 
-    def _normalize_ingredient(self, ingredient):
+    def _coerce_quantitied_ingredient(self, ingredient):
         '''
         Try to convert the given input to a QuantitiedIngredient.
         '''
@@ -131,6 +131,14 @@ class RecipeDB:
             raise TypeError('Type not recognized', ingredient)
 
         return ingredient
+
+    def _normalize_ingredient_name(self, name):
+        '''
+        Apply any normalization rules that bring multiple equivalent forms
+        of an ingredient name to a single, consistent form.
+        '''
+        name = name.replace('_', ' ')
+        return name
 
     def get_image(self, id):
         '''
@@ -172,6 +180,7 @@ class RecipeDB:
         else:
             # fetch by Name
             # make sure to check the autocorrect table first.
+            name = self._normalize_ingredient_name(name)
             cur.execute('SELECT * FROM Ingredient WHERE Name = ?', [name])
             ingredient_row = cur.fetchone()
 
@@ -187,7 +196,7 @@ class RecipeDB:
             *,
             id=None,
             name=None,
-    ):
+        ):
         '''
         Fetch a single IngredientTag by its ID or name.
         '''
@@ -264,6 +273,7 @@ class RecipeDB:
         '''
         # Check if this name is already taken by the autocorrect or other ing.
         # - if so, raise an exception.
+        name = self._normalize_ingredient_name(name)
         cur = self.sql.cursor()
         cur.execute('SELECT * FROM Ingredient WHERE name = ?', [name])
         ingredient_row = cur.fetchone()
@@ -345,7 +355,7 @@ class RecipeDB:
         query = 'INSERT INTO Recipe VALUES(%s)' % qmarks
         cur.execute(query, bindings)
 
-        ingredients = [self._normalize_ingredient(ingredient) for ingredient in ingredients]
+        ingredients = [self._coerce_quantitied_ingredient(ingredient) for ingredient in ingredients]
 
         for quant_ingredient in ingredients:
             recipe_ingredient_data = {
