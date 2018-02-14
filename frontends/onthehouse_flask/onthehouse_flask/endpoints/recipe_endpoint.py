@@ -25,6 +25,8 @@ def recipes():
 @site.route('/recipe/search')
 def recipes_search():
     ingredients = request.args.get('ingredients', None)
+    strict_ingredients = request.args.get('strict', False)
+    strict_ingredients = recipedb.helpers.truthystring(strict_ingredients)
 
     failure = False
     if ingredients is not None:
@@ -43,6 +45,9 @@ def recipes_search():
     if failure:
         results = []
     else:
-        results = common.rdb.search(ingredients=ingredients)
+        results = common.rdb.search(
+            ingredients=ingredients,
+            strict_ingredients=strict_ingredients,
+        )
     response = render_template("recipes.html", recipes=results)
     return response
