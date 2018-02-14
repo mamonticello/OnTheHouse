@@ -1,14 +1,21 @@
+import flask; from flask import render_template, flash, request
 from Objects import User
-from app.forms import RegistrationForm
+from . import forms 
+from forms import RegistrationForm
 from flask_login import current_user, login_user
 
-@app.route('/register', methods=['GET', 'POST'])
+from . import common
+
+site = common.site
+
+@site.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(username=form.username.data)
+        user.set_displayname(form.displayname.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -16,7 +23,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-@app.route('/login', methods=['GET', 'POST'])
+@site.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
@@ -30,7 +37,7 @@ def login():
         return redirect(url_for('index'))
     return render_template('login.html', title='Sign In', form=form)
 
-@app.route('/', methods=['GET', 'POST'])
+@site.route('/', methods=['GET', 'POST'])
 def login():
     error = None
     if request.method == 'POST':
@@ -43,7 +50,7 @@ def login():
             return redirect(url_for('secret'))
     return render_template('login.html', error=error)
 
-@app.route('/secret')
+@site.route('/secret')
 def secret():
     return "You have successfully logged in"
 
