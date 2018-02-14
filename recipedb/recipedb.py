@@ -436,11 +436,10 @@ class RecipeDB:
 
         query = 'SELECT * FROM Recipe {wheres}'
         query = query.format(wheres=wheres)
-        self.log.debug(query)
-        self.log.debug(bindings)
+        self.log.debug("%s %s", query, bindings)
         cur.execute(query, bindings)
 
-        results = []
+        match_counts = {}
         while True:
             recipe_row = cur.fetchone()
             if recipe_row is None:
@@ -453,16 +452,23 @@ class RecipeDB:
                 continue
 
             if ingredients:
-                if strict_ingredients:
-                    if not recipe_ingredients.issubset(ingredients):
-                        continue
-                else:
-                    if not recipe_ingredients.intersection(ingredients):
-                        continue
+                matches = recipe_ingredients.intersection(ingredients)
 
-            results.append(recipe)
-            if limit is not None and len(results) >= limit:
+                if not matches:
+                    continue
+
+                if strict_ingredients and matches != recipe_ingredients:
+                    # Recipe must be strict subset of our request -> all match.
+                    continue
+
+                match_counts[recipe] = len(matches)
+            else:
+                match_counts[recipe] = 1
+
+            if limit is not None and len(match_counts) >= limit:
                 break
+
+        results = sorted(match_counts.keys(), key=match_counts.get, reverse=True)
 
         return results
 
