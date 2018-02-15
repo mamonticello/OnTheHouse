@@ -17,7 +17,7 @@
             <div class="boxed" style="border-radius:10px;background:#ee3333;height:25px;padding-top:2px;padding-left:8px;font-family:Verdana;color:#efefef">
             <p id="infobar"></p>
             <script>
-                document.getElementById("infobar").innerHTML += {{recipe.meal_type}} | "
+                document.getElementById("infobar").innerHTML += {{recipe.meal_type}} | ";
                 if ({{recipe.prep_time}} >= 60) {
                     document.getElementById("infobar").innerHTML += "" + Math.trunc({{recipe.prep_time}} / 60) + " hr ";
                 }
