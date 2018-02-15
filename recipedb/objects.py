@@ -93,6 +93,12 @@ class IngredientTag(ObjectBase):
         # Check if `name` is already taken somewhere else.
         raise NotImplementedError
 
+    def parent(self):
+        if self.parent_id is None:
+            return None
+
+        return self.recipedb.get_ingredient_tag_by_id(self.parent_id)
+
 
 class QuantitiedIngredient(ObjectBase):
     def __init__(self, recipedb, db_row):

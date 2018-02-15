@@ -65,6 +65,9 @@ class Exists(RecipeDBException):
 class IngredientExists(Exists):
     error_message = 'Ingredient "{}" already exists.'
 
+class IngredientTagExists(Exists):
+    error_message = 'IngredientTag "{}" already exists.'
+
 class UserExists(Exists):
     error_message = 'User "{}" already exists.'
 
