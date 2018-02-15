@@ -8,7 +8,6 @@ site = common.site
 @site.route('/user/<username>')
 def get_user(username):
     user = common.rdb.get_user(id = None, username = username)
-    print (user)
     recipes = common.rdb.search(author=user)
     response = render_template("profile.html", user=user, recipes=recipes)
     return response
