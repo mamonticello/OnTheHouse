@@ -14,7 +14,7 @@
             <p class="recipe-author" style="font-family:Arial;font-size:18px">Recipe by <a style="color:#ee3333" href="/user/{{recipe.author.username}}">{{recipe.author.display_name}}</a></p>
             {% endif %}
             <hr>
-            div class="boxed" style="border-radius:10px;background:#ee3333;height:25px;padding-top:2px;padding-left:8px;font-family:Verdana;color:#efefef">
+            <div class="boxed" style="border-radius:10px;background:#ee3333;height:25px;padding-top:2px;padding-left:8px;font-family:Verdana;color:#efefef">
             <p id="infobar"></p>
             <script>
                 document.getElementById("infobar").innerHTML += {{recipe.meal_type}} | "
