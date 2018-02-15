@@ -328,7 +328,34 @@ class RecipeDB:
         '''
         Create a new IngredientTag, either a root or grouped under `parent`.
         '''
-        raise NotImplementedError
+        name = self._normalize_ingredient_name(name)
+        try:
+            self.get_ingredient_tag_by_name(name)
+        except exceptions.NoSuchIngredientTag:
+            pass
+        else:
+            raise exceptions.IngredientTagExists(name)
+
+        if parent is not None:
+            parent_id = parent.id
+        else:
+            parent_id = None
+
+        data = {
+            'IngredientTagID': helpers.random_hex(),
+            'TagName': name,
+            'ParentTagID': parent_id,
+        }
+
+        cur = self.sql.cursor()
+        (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_INGREDIENTTAG_COLUMNS, data)
+        query = 'INSERT INTO IngredientTag VALUES(%s)' % qmarks
+        cur.execute(query, bindings)
+        self.sql.commit()
+
+        tag = objects.IngredientTag(self, data)
+        self.log.debug('Created IngredientTag %s', tag.name)
+        return tag
 
     def new_recipe(
             self,
@@ -514,7 +541,6 @@ class RecipeDB:
         '''
         Register a new User to the database
         '''
-
         try:
             self.get_user(username=username)
         except exceptions.NoSuchUser:
