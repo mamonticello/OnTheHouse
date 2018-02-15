@@ -140,6 +140,19 @@ class RecipeDB:
         name = name.replace('_', ' ')
         return name
 
+    def check_password(
+            self,
+            *,
+            user_id: str,
+            password: str,
+        ):
+        '''
+        Check a typed password against the user's password
+        '''
+        user = get_user(id=user_id)
+        return bcrypt.checkpw(password, user.password_hash)
+
+
     def get_image(self, id):
         '''
         Fetch an image by its ID
@@ -266,6 +279,50 @@ class RecipeDB:
         recipe_rows = cur.fetchall()
         recipe_objects = [objects.Recipe(self, row) for row in recipe_rows]
         return recipe_objects
+
+    def get_user(self, *, id=None, username=None):
+        '''
+        Fetch an user by their ID
+        '''
+        if id is None and username is None:
+            raise TypeError('id and username can\'t both be None.')
+
+        if id is not None:
+            user = get_user_by_id(self, id)
+        else:
+            user = get_user_by_username(self,name)
+
+        return user
+
+    def get_user_by_id(self, id)
+        '''
+        Fetch an user by their ID
+        '''
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM User WHERE UserID = ?', [id])
+        user_row = cur.fetchone()
+
+        if user_row is not None:
+            user = objects.User(self, user_row)
+        else:
+            raise exceptions.NoSuchUser('ID:' + id)
+
+        return user
+    
+    def get_user_by_username(self, username)
+        '''
+        Fetch an user by their username
+        '''
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM User Where Username = ?', [username])
+        user_row = cur.fetchone()
+
+        if user_row is not None:
+            user = objects.User(self, user_row)
+        else:
+            raise exceptions.NoSuchUser('Name: ' + username)
+
+        return user
 
     def new_image(self, filepath):
         '''
@@ -585,36 +642,3 @@ class RecipeDB:
         self.log.debug('Created user %s with ID %s', user.username, user.id)
         return user
 
-    def get_user(self, *, id=None, username=None):
-        '''
-        Fetch an user by their ID
-        '''
-        if id is None and username is None:
-            raise TypeError('id and username can\'t both be None.')
-
-        cur = self.sql.cursor()
-        if id is not None:
-            cur.execute('SELECT * FROM User WHERE UserID = ?', [id])
-            user_row = cur.fetchone()
-        else:
-            cur.execute('SELECT * FROM User Where Username = ?', [username])
-            user_row = cur.fetchone()
-
-        if user_row is not None:
-            user = objects.User(self, user_row)
-        else:
-            raise ValueError('User %s does not exist' % id)
-
-        return user
-
-    def check_password(
-            self,
-            *,
-            user_id: str,
-            password: str,
-        ):
-        '''
-        Check a typed password against the user's password
-        '''
-        user = get_user(id=user_id)
-        return bcrypt.checkpw(password, user.password_hash)
