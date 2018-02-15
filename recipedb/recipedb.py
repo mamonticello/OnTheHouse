@@ -174,21 +174,33 @@ class RecipeDB:
 
         cur = self.sql.cursor()
         if id is not None:
-            # fetch by ID
-            cur.execute('SELECT * FROM Ingredient WHERE IngredientID = ?', [id])
-            ingredient_row = cur.fetchone()
+            ingredient = self.get_ingredient_by_id(id)
         else:
-            # fetch by Name
-            # make sure to check the autocorrect table first.
-            name = self._normalize_ingredient_name(name)
-            cur.execute('SELECT * FROM Ingredient WHERE Name = ?', [name])
-            ingredient_row = cur.fetchone()
+            ingredient = self.get_ingredient_by_name(name)
+
+        return ingredient
+
+    def get_ingredient_by_id(self, id):
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM Ingredient WHERE IngredientID = ?', [id])
+        ingredient_row = cur.fetchone()
 
         if ingredient_row is None:
-            raise exceptions.NoSuchIngredient(id or name)
+            raise exceptions.NoSuchIngredient('ID: ' + id)
 
         ingredient = objects.Ingredient(self, ingredient_row)
+        return ingredient
 
+    def get_ingredient_by_name(self, name):
+        name = self._normalize_ingredient_name(name)
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM Ingredient WHERE Name = ?', [name])
+        ingredient_row = cur.fetchone()
+
+        if ingredient_row is None:
+            raise exceptions.NoSuchIngredient('Name: ' + name)
+
+        ingredient = objects.Ingredient(self, ingredient_row)
         return ingredient
 
     def get_ingredient_tag(
