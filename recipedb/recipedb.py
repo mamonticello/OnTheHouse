@@ -290,14 +290,15 @@ class RecipeDB:
         '''
         Add a new Ingredient to the database.
         '''
-        # Check if this name is already taken by the autocorrect or other ing.
-        # - if so, raise an exception.
         name = self._normalize_ingredient_name(name)
+        try:
+            self.get_ingredient_by_name(name)
+        except exceptions.NoSuchIngredient:
+            pass
+        else:
+            raise exceptions.IngredientExists(name)
+
         cur = self.sql.cursor()
-        cur.execute('SELECT * FROM Ingredient WHERE name = ?', [name])
-        ingredient_row = cur.fetchone()
-        if ingredient_row is not None:
-            raise ValueError('Ingredient %s already exists' % name)
 
         data = {
             'IngredientID': helpers.random_hex(),
