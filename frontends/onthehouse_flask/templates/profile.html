@@ -12,7 +12,7 @@
                 <img class="img-rounded" width="100%" src="/static/default_profile_pic.jpg" alt="Profile picture">
             </div>
             <div class="col-sm-6">
-                <h2 style="margin=50px 30px 20px 0px;" class="well">John Doe</h2>
+                <h2 style="margin: 50px 30px 20px 0px;" class="well"> {{ user.DisplayName }} </h2>
                 <h4 id="join-date">Member Since {{ user.DateJoined }}</h4>
                 <p id="bio" class="well well-lg">{{ user.BioText }}</p>
             </div>
@@ -27,9 +27,11 @@
             <div class="col-sm-12" style="margin-top: 50px"></div>
             {% for recipe in recipes %}
                 <div class="col-sm-4 user-recipe">
+                <a href="/recipe/{{recipe.id}}/{{recipe.slug}}"> 
                     <img class="user-recipe-img" alt="Recipe Image" src="{{'/static/default_recipe_pic.jpg' if recipe.recipe_image_id is none else '/image/' + recipe.recipe_image_id }}">
                     <h3>{{ recipe.name }}</h3>
-                    <h4>{{ recipe.date_added }}</h4>
+                </a>
+                    <h4>Added: {{ recipe.date_added }}</h4>
                 </div>
             {% endfor %}
         </div>
