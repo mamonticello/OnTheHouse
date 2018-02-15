@@ -294,7 +294,7 @@ class RecipeDB:
 
         return user
 
-    def get_user_by_id(self, id)
+    def get_user_by_id(self, id):
         '''
         Fetch an user by their ID
         '''
@@ -309,7 +309,7 @@ class RecipeDB:
 
         return user
     
-    def get_user_by_username(self, username)
+    def get_user_by_username(self, username):
         '''
         Fetch an user by their username
         '''
