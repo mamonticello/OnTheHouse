@@ -160,19 +160,13 @@ class RecipeDB:
         except exceptions.NoSuchIngredient:
             return self.new_ingredient(name)
 
-    def get_ingredient(
-            self,
-            *,
-            id=None,
-            name=None,
-        ):
+    def get_ingredient(self, *, id=None, name=None):
         '''
         Fetch a single Ingredient by its ID or name.
         '''
         if id is None and name is None:
             raise TypeError('id and name can\'t both be None.')
 
-        cur = self.sql.cursor()
         if id is not None:
             ingredient = self.get_ingredient_by_id(id)
         else:
@@ -210,27 +204,43 @@ class RecipeDB:
         ingredient = objects.Ingredient(self, ingredient_row)
         return ingredient
 
-    def get_ingredient_tag(
-            self,
-            *,
-            id=None,
-            name=None,
-        ):
+    def get_ingredient_tag(self, *, id=None, name=None):
         '''
         Fetch a single IngredientTag by its ID or name.
         '''
         if id is None and name is None:
             raise TypeError('id and name can\'t both be None.')
 
-        cur = self.sql.cursor()
         if id is not None:
-            # fetch by ID
-            pass
+            tag = self.get_ingredient_tag_by_id(id)
         else:
-            # fetch by Name
-            pass
+            tag = self.get_ingredient_tag_by_name(name)
 
-        raise NotImplementedError
+        return tag
+
+    def get_ingredient_tag_by_id(self, id):
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM IngredientTag WHERE IngredientTagID = ?', [id])
+        tag_row = cur.fetchone()
+
+        if tag_row is None:
+            raise exceptions.NoSuchIngredientTag('ID: ' + id)
+
+        tag = objects.IngredientTag(self, tag_row)
+        return tag
+
+    def get_ingredient_tag_by_name(self, name):
+        name = self._normalize_ingredient_name(name)
+
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM IngredientTag WHERE TagName = ?', [name])
+        tag_row = cur.fetchone()
+
+        if tag_row is None:
+            raise exceptions.NoSuchIngredientTag('Name: ' + name)
+
+        tag = objects.IngredientTag(self, tag_row)
+        return tag
 
     def get_recipe(self, id):
         '''
