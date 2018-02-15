@@ -1,5 +1,5 @@
 {% extends "root.html" %}
-{% block title %} {{ user.DisplayName }} {% endblock %}
+{% block title %} {{ user.display_name }} {% endblock %}
 
 {% block head %}
     {{ super() }}
@@ -12,9 +12,9 @@
                 <img class="img-rounded" width="100%" src="/static/default_profile_pic.jpg" alt="Profile picture">
             </div>
             <div class="col-sm-6">
-                <h2 style="margin: 50px 30px 20px 0px;" class="well"> {{ user.DisplayName }} </h2>
-                <h4 id="join-date">Member Since {{ user.DateJoined }}</h4>
-                <p id="bio" class="well well-lg">{{ user.BioText }}</p>
+                <h2 style="margin: 50px 30px 20px 0px;" class="well"> {{ user.display_name }} </h2>
+                <h4 id="join-date">Member Since {{ user.date_joined }}</h4>
+                <p id="bio" class="well well-lg">{{ user.bio_text }}</p>
             </div>
             <div class="col-sm-2"></div>
         <div class="col-sm-12"></div>
