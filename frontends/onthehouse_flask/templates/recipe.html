@@ -9,7 +9,7 @@
     <div class="row content">
         <div class="col-sm-12">
             <p class="recipe-name" style="padding-top:50px;font-family:Verdana;font-size:32px;color:#555555;text-shadow:2px 2px #dddddd">{{recipe.name}}</p>
-            <p><img src="/image/{{recipe.recipe_image_id}}"/></p>
+            <p><img class="img-rounded" src="/image/{{recipe.recipe_image_id}}"/></p>
             {% if recipe.author is not none %}
             <p class="recipe-author" style="font-family:Arial;font-size:18px">Recipe by <a style="color:#ee3333" href="/user/{{recipe.author.username}}">{{recipe.author.display_name}}</a></p>
             {% endif %}
@@ -17,13 +17,14 @@
             <div class="boxed" style="border-radius:10px;background:#ee3333;height:25px;padding-top:2px;padding-left:8px;font-family:Verdana;color:#efefef">
             <p id="infobar"></p>
             <script>
-                document.getElementById("infobar").innerHTML += {{recipe.meal_type}} + " | ";
-                if ({{recipe.prep_time}} >= 60) {
-                    document.getElementById("infobar").innerHTML += "" + Math.trunc({{recipe.prep_time}} / 60) + " hr ";
+                document.getElementById("infobar").innerHTML += {{recipe.meal_type|tojson}} + " | ";
+                if ({{recipe.prep_time|tojson}} >= 60) {
+                    document.getElementById("infobar").innerHTML += "" + Math.trunc({{recipe.prep_time|tojson}} / 60) + " hr ";
                 }
-                document.getElementById("infobar").innerHTML += "" + ({{recipe.prep_time}} % 60) + " min | ";
-                document.getElementById("infobar").innerHTML += "Serves " + {{recipe.serving_size}};
+                document.getElementById("infobar").innerHTML += "" + ({{recipe.prep_time|tojson}} % 60) + " min | ";
+                document.getElementById("infobar").innerHTML += "Serves " + {{recipe.serving_size|tojson}};
             </script>
+            
             </div>
             <div style="margin:auto">
                 <div class="recipe-ingredients" style="float:left;width:40%;padding-top:25px"><span style=";font-family:Verdana;font-size:24px;color:#555555;">Ingredients</span>
@@ -44,15 +45,15 @@
             </div></div>
             <p class="recipe-instructions"><span style="font-family:Verdana;font-size:24px;color:#555555;">Instructions</span>
                 <hr>{{recipe.instructions}}</p>
-            div class="boxed2" style="border-radius:10px;background:#ee3333;height:25px;padding-top:2px;padding-left:8px;font-family:Verdana;color:#efefef">
+            <div class="boxed2" style="border-radius:10px;background:#ee3333;height:25px;padding-top:2px;padding-left:8px;font-family:Verdana;color:#efefef">
             <p id="infobar2"></p>
             <script>
-                document.getElementById("infobar2").innerHTML += {{recipe.meal_type}} + " | ";
+                document.getElementById("infobar2").innerHTML += {{recipe.meal_type|tojson}} + " | ";
                 if ({{recipe.prep_time}} >= 60) {
-                    document.getElementById("infobar2").innerHTML += "" + Math.trunc({{recipe.prep_time}} / 60) + " hr ";
+                    document.getElementById("infobar2").innerHTML += "" + Math.trunc({{recipe.prep_time|tojson}} / 60) + " hr ";
                 }
-                document.getElementById("infobar2").innerHTML += "" + ({{recipe.prep_time}} % 60) + " min | ";
-                document.getElementById("infobar2").innerHTML += "Serves " + {{recipe.serving_size}};
+                document.getElementById("infobar2").innerHTML += "" + ({{recipe.prep_time|tojson}} % 60) + " min | ";
+                document.getElementById("infobar2").innerHTML += "Serves " + {{recipe.serving_size|tojson}};
             </script>
             </div>
         </div>
