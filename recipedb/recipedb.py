@@ -474,12 +474,12 @@ class RecipeDB:
 
     def new_user(
             self,
-            *,
             username: str,
-            display_name: str,
             password: str,
-            bio_text: str,
-            profile_image: objects.Image
+            *,
+            display_name: str=None,
+            bio_text: str=None,
+            profile_image: objects.Image=None,
         ):
         '''
         Register a new User to the database
@@ -489,6 +489,12 @@ class RecipeDB:
         user_id = helpers.random_hex()
         password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         date_joined = helpers.now()
+
+        if not display_name:
+            display_name = username
+
+        if not bio_text:
+            bio_text = ''
 
         if profile_image is not None:
             profile_image_id = profile_image.id
