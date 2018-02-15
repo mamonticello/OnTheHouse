@@ -288,9 +288,9 @@ class RecipeDB:
             raise TypeError('id and username can\'t both be None.')
 
         if id is not None:
-            user = get_user_by_id(self, id)
+            user = self.get_user_by_id(id)
         else:
-            user = get_user_by_username(self,name)
+            user = self.get_user_by_username(username)
 
         return user
 
