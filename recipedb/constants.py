@@ -49,7 +49,7 @@ CREATE INDEX IF NOT EXISTS index_IngredientAutocorrect_AlternateName on Ingredie
 ----------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS IngredientTag(
     IngredientTagID TEXT PRIMARY KEY,
-    TagName TEXT,
+    TagName TEXT COLLATE NOCASE,
     ParentTagID TEXT
 );
 ----------------------------------------------------------------------------------------------------
