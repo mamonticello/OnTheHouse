@@ -27,7 +27,7 @@
             <div class="col-sm-12" style="margin-top: 50px"></div>
             {% for recipe in recipes %}
                 <div class="col-sm-4 user-recipe">
-                    <img class="user-recipe-img" alt="Recipe Image" src="{{ '/static/default_recipe_pic.jpg' if recipe.recipe_image_id is none else '/image/{{recipe.recipe_image_id}}'">
+                    <img class="user-recipe-img" alt="Recipe Image" src="{{'/static/default_recipe_pic.jpg' if recipe.recipe_image_id is none else '/image/' + recipe.recipe_image_id }}">
                     <h3>{{ recipe.name }}</h3>
                     <h4>{{ recipe.date_added }}</h4>
                 </div>
