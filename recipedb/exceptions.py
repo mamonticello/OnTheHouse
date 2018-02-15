@@ -59,6 +59,9 @@ class DatabaseOutOfDate(RecipeDBException):
     error_message = OUTOFDATE
 
 
+class AlreadyHasParent(RecipeDBException):
+    error_message = 'Tag "{tag}" already has parent "{parent}"'
+
 class Exists(RecipeDBException):
     pass
 

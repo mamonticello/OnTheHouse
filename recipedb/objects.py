@@ -117,15 +117,55 @@ class IngredientTag(ObjectBase):
         self.name = db_row['TagName']
         self.parent_id = db_row['ParentTagID']
 
-    def rename(self, name):
-        # Check if `name` is already taken somewhere else.
-        raise NotImplementedError
+    def add_child(self, tag):
+        cur = self.recipedb.sql.cursor()
+        cur.execute('SELECT ParentTagID FROM IngredientTag WHERE IngredientTagID = ?', [tag.id])
+        row = cur.fetchone()[0]
+        if row is not None:
+            raise exceptions.AlreadyHasParent(tag=tag, parent=self)
 
-    def parent(self):
+        data = {
+            'IngredientTagID': tag.id,
+            'ParentTagID': self.id,
+        }
+        (query, bindings) = sqlhelpers.update_filler(data, where_key='IngredientTagID')
+        query = 'UPDATE IngredientTag %s' % query
+        cur.execute(query, bindings)
+        tag.parent_id = self.id
+        self.recipedb.sql.commit()
+
+    def get_children(self):
+        cur = self.recipedb.sql.cursor()
+        cur.execute('SELECT * FROM IngredientTag WHERE ParentTagID = ?', [self.id])
+        rows = cur.fetchall()
+        tags = set(IngredientTag(self.recipedb, row) for row in rows)
+        return tags
+
+    def get_parent(self):
         if self.parent_id is None:
             return None
 
         return self.recipedb.get_ingredient_tag_by_id(self.parent_id)
+
+    def leave_parent(self):
+        parent = self.get_parent()
+        if parent is None:
+            return
+
+        data = {
+            'ParentTagID': None,
+            'IngredientTagID': self.id,
+        }
+        cur = self.recipedb.sql.cursor()
+        (query, bindings) = sqlhelpers.update_filler(data, where_key='IngredientTagID')
+        query = 'UPDATE IngredientTag %s' % query
+        cur.execute(query, bindings)
+        self.parent_id = None
+        self.recipedb.sql.commit()
+
+    def rename(self, name):
+        # Check if `name` is already taken somewhere else.
+        raise NotImplementedError
 
 
 class QuantitiedIngredient(ObjectBase):
@@ -196,6 +236,18 @@ class Recipe(ObjectBase):
         ingredients = {QuantitiedIngredient(self.recipedb, line) for line in lines}
 
         return ingredients
+
+    def get_ingredients_and_tags(self):
+        everything = {qi.ingredient for qi in self.get_ingredients()}
+        tags = set()
+        for ingredient in everything:
+            tags.update(ingredient.get_tags())
+        everything.update(tags)
+        while len(tags) > 0:
+            tags = {tag.get_parent() for tag in tags}
+            tags = {tag for tag in tags if tag is not None}
+            everything.update(tags)
+        return everything
 
     def set_recipe_pic(self, image):
         raise NotImplementedError
