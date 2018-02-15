@@ -1,6 +1,11 @@
-from . import constants
 from flask_login import UserMixin
+
+from . import constants
+from . import exceptions
 from . import helpers
+
+from voussoirkit import sqlhelpers
+
 
 class ObjectBase:
     def __init__(self, recipedb):
@@ -42,6 +47,25 @@ class Ingredient(ObjectBase):
 
         self.id = db_row['IngredientID']
         self.name = db_row['Name']
+
+    def add_autocorrect(self, alternate_name):
+        alternate_name = self.recipedb._normalize_ingredient_name(alternate_name)
+        try:
+            existing = self.recipedb.get_ingredient_by_name(alternate_name)
+        except exceptions.NoSuchIngredient:
+            pass
+        else:
+            raise exceptions.IngredientExists(alternate_name)
+        cur = self.recipedb.sql.cursor()
+
+        data = {
+            'IngredientID': self.id,
+            'AlternateName': alternate_name,
+        }
+        (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_INGREDIENTAUTOCORRECT_COLUMNS, data)
+        query = 'INSERT INTO IngredientAutocorrect VALUES(%s)' % qmarks
+        cur.execute(query, bindings)
+        self.recipedb.sql.commit()
 
     def add_tag(self, tag):
         raise NotImplementedError

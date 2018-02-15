@@ -194,6 +194,13 @@ class RecipeDB:
     def get_ingredient_by_name(self, name):
         name = self._normalize_ingredient_name(name)
         cur = self.sql.cursor()
+
+        cur.execute('SELECT IngredientID FROM IngredientAutocorrect WHERE AlternateName = ?', [name])
+        ingredient_row = cur.fetchone()
+
+        if ingredient_row is not None:
+            return self.get_ingredient_by_id(ingredient_row[0])
+
         cur.execute('SELECT * FROM Ingredient WHERE Name = ?', [name])
         ingredient_row = cur.fetchone()
 

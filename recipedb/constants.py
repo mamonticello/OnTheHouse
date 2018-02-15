@@ -148,6 +148,7 @@ def _extract_column_names(table):
 
 SQL_IMAGE_COLUMNS = _extract_column_names('Image')
 SQL_INGREDIENT_COLUMNS = _extract_column_names('Ingredient')
+SQL_INGREDIENTAUTOCORRECT_COLUMNS = _extract_column_names('IngredientAutocorrect')
 SQL_INGREDIENTTAG_COLUMNS = _extract_column_names('IngredientTag')
 SQL_RECIPE_COLUMNS = _extract_column_names('Recipe')
 SQL_RECIPEINGREDIENT_COLUMNS = _extract_column_names('Recipe_Ingredient_Map')
