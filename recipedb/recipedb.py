@@ -457,8 +457,8 @@ class RecipeDB:
                 if not matches:
                     continue
 
-                if strict_ingredients and matches != recipe_ingredients:
-                    # Recipe must be strict subset of our request -> all match.
+                if strict_ingredients and matches != ingredients:
+                    # Recipe must contain all of our search.
                     continue
 
                 match_counts[recipe] = len(matches)
