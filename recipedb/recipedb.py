@@ -160,58 +160,87 @@ class RecipeDB:
         except exceptions.NoSuchIngredient:
             return self.new_ingredient(name)
 
-    def get_ingredient(
-            self,
-            *,
-            id=None,
-            name=None,
-        ):
+    def get_ingredient(self, *, id=None, name=None):
         '''
         Fetch a single Ingredient by its ID or name.
         '''
         if id is None and name is None:
             raise TypeError('id and name can\'t both be None.')
 
-        cur = self.sql.cursor()
         if id is not None:
-            # fetch by ID
-            cur.execute('SELECT * FROM Ingredient WHERE IngredientID = ?', [id])
-            ingredient_row = cur.fetchone()
+            ingredient = self.get_ingredient_by_id(id)
         else:
-            # fetch by Name
-            # make sure to check the autocorrect table first.
-            name = self._normalize_ingredient_name(name)
-            cur.execute('SELECT * FROM Ingredient WHERE Name = ?', [name])
-            ingredient_row = cur.fetchone()
-
-        if ingredient_row is None:
-            raise exceptions.NoSuchIngredient(id or name)
-
-        ingredient = objects.Ingredient(self, ingredient_row)
+            ingredient = self.get_ingredient_by_name(name)
 
         return ingredient
 
-    def get_ingredient_tag(
-            self,
-            *,
-            id=None,
-            name=None,
-        ):
+    def get_ingredient_by_id(self, id):
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM Ingredient WHERE IngredientID = ?', [id])
+        ingredient_row = cur.fetchone()
+
+        if ingredient_row is None:
+            raise exceptions.NoSuchIngredient('ID: ' + id)
+
+        ingredient = objects.Ingredient(self, ingredient_row)
+        return ingredient
+
+    def get_ingredient_by_name(self, name):
+        name = self._normalize_ingredient_name(name)
+        cur = self.sql.cursor()
+
+        cur.execute('SELECT IngredientID FROM IngredientAutocorrect WHERE AlternateName = ?', [name])
+        ingredient_row = cur.fetchone()
+
+        if ingredient_row is not None:
+            return self.get_ingredient_by_id(ingredient_row[0])
+
+        cur.execute('SELECT * FROM Ingredient WHERE Name = ?', [name])
+        ingredient_row = cur.fetchone()
+
+        if ingredient_row is None:
+            raise exceptions.NoSuchIngredient('Name: ' + name)
+
+        ingredient = objects.Ingredient(self, ingredient_row)
+        return ingredient
+
+    def get_ingredient_tag(self, *, id=None, name=None):
         '''
         Fetch a single IngredientTag by its ID or name.
         '''
         if id is None and name is None:
             raise TypeError('id and name can\'t both be None.')
 
-        cur = self.sql.cursor()
         if id is not None:
-            # fetch by ID
-            pass
+            tag = self.get_ingredient_tag_by_id(id)
         else:
-            # fetch by Name
-            pass
+            tag = self.get_ingredient_tag_by_name(name)
 
-        raise NotImplementedError
+        return tag
+
+    def get_ingredient_tag_by_id(self, id):
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM IngredientTag WHERE IngredientTagID = ?', [id])
+        tag_row = cur.fetchone()
+
+        if tag_row is None:
+            raise exceptions.NoSuchIngredientTag('ID: ' + id)
+
+        tag = objects.IngredientTag(self, tag_row)
+        return tag
+
+    def get_ingredient_tag_by_name(self, name):
+        name = self._normalize_ingredient_name(name)
+
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM IngredientTag WHERE TagName = ?', [name])
+        tag_row = cur.fetchone()
+
+        if tag_row is None:
+            raise exceptions.NoSuchIngredientTag('Name: ' + name)
+
+        tag = objects.IngredientTag(self, tag_row)
+        return tag
 
     def get_recipe(self, id):
         '''
@@ -271,14 +300,15 @@ class RecipeDB:
         '''
         Add a new Ingredient to the database.
         '''
-        # Check if this name is already taken by the autocorrect or other ing.
-        # - if so, raise an exception.
         name = self._normalize_ingredient_name(name)
+        try:
+            self.get_ingredient_by_name(name)
+        except exceptions.NoSuchIngredient:
+            pass
+        else:
+            raise exceptions.IngredientExists(name)
+
         cur = self.sql.cursor()
-        cur.execute('SELECT * FROM Ingredient WHERE name = ?', [name])
-        ingredient_row = cur.fetchone()
-        if ingredient_row is not None:
-            raise ValueError('Ingredient %s already exists' % name)
 
         data = {
             'IngredientID': helpers.random_hex(),
@@ -474,21 +504,35 @@ class RecipeDB:
 
     def new_user(
             self,
-            *,
             username: str,
-            display_name: str,
             password: str,
-            bio_text: str,
-            profile_image: objects.Image
+            *,
+            display_name: str=None,
+            bio_text: str=None,
+            profile_image: objects.Image=None,
         ):
         '''
         Register a new User to the database
         '''
+
+        try:
+            self.get_user(username=username)
+        except exceptions.NoSuchUser:
+            pass
+        else:
+            raise exceptions.UserExists(username)
+
         cur = self.sql.cursor()
 
         user_id = helpers.random_hex()
         password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         date_joined = helpers.now()
+
+        if not display_name:
+            display_name = username
+
+        if not bio_text:
+            bio_text = ''
 
         if profile_image is not None:
             profile_image_id = profile_image.id

@@ -59,6 +59,16 @@ class DatabaseOutOfDate(RecipeDBException):
     error_message = OUTOFDATE
 
 
+class Exists(RecipeDBException):
+    pass
+
+class IngredientExists(Exists):
+    error_message = 'Ingredient "{}" already exists.'
+
+class UserExists(Exists):
+    error_message = 'User "{}" already exists.'
+
+
 class NoSuch(RecipeDBException):
     pass
 
