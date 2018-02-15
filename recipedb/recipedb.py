@@ -484,6 +484,14 @@ class RecipeDB:
         '''
         Register a new User to the database
         '''
+
+        try:
+            self.get_user(username=username)
+        except exceptions.NoSuchUser:
+            pass
+        else:
+            raise exceptions.UserExists(username)
+
         cur = self.sql.cursor()
 
         user_id = helpers.random_hex()
