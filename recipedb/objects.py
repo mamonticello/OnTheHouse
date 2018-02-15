@@ -68,10 +68,38 @@ class Ingredient(ObjectBase):
         self.recipedb.sql.commit()
 
     def add_tag(self, tag):
-        raise NotImplementedError
+        cur = self.recipedb.sql.cursor()
+        cur.execute(
+            'SELECT * FROM Ingredient_IngredientTag_Map WHERE IngredientID = ? AND IngredientTagID = ?',
+            [self.id, tag.id]
+        )
+        exists = cur.fetchone()
+        if exists is not None:
+            return
+
+        data = {
+            'IngredientID': self.id,
+            'IngredientTagID': tag.id,
+        }
+        (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_INGREDIENTINGREDIENTTAG_COLUMNS, data)
+        query = 'INSERT INTO Ingredient_IngredientTag_Map VALUES(%s)' % qmarks
+        cur.execute(query, bindings)
+        self.recipedb.sql.commit()
+
+    def get_tags(self):
+        cur = self.recipedb.sql.cursor()
+        cur.execute('SELECT IngredientTagID FROM Ingredient_IngredientTag_Map WHERE IngredientID = ?', [self.id])
+        lines = cur.fetchall()
+        tags = {self.recipedb.get_ingredient_tag_by_id(line[0]) for line in lines}
+
+        return tags
 
     def remove_tag(self, tag):
-        raise NotImplementedError
+        cur = self.recipedb.sql.cursor()
+        cur.execute('DELETE FROM Ingredient_IngredientTag_Map WHERE IngredientID = ? AND IngredientTagId = ?',
+            [self.id, tag.id]
+        )
+        self.recipedb.sql.commit()
 
     def rename(self, name):
         # Check if `name` is already taken by an other ingredient
