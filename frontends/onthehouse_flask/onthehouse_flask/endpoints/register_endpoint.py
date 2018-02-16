@@ -47,12 +47,17 @@ def post_register():
     except  KeyError;
         flask.abort(400)
 
-    if password != password2
+    if password != password2 or username == ""
         flask.abort(403)
 
     common.rdb.new_user(self, username=username, password=password, display_name=displayname, bio_text=None, profile_image=None)
 
-    raise NotImplementedError
+    response = jsonify.make_json_response({})
+    response.set_cookie(
+        'id',
+        value=recipedb.helpers.random_hex(length=32),
+        max_age=COOKIE_MAX_AGE,
+    )
 
 
 
