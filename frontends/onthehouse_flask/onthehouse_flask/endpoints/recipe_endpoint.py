@@ -43,6 +43,7 @@ def recipes():
 def recipes_search():
     ingredients = normalize_ingredients(request.args.get('ingredients', None))
     ingredients_exclude = normalize_ingredients(request.args.get('exclude', None))
+    meal_type = request.args.get('meal_type', None)
     strict_ingredients = request.args.get('strict', False)
     strict_ingredients = recipedb.helpers.truthystring(strict_ingredients)
 
@@ -57,6 +58,7 @@ def recipes_search():
         results = common.rdb.search(
             ingredients=ingredients,
             ingredients_exclude=ingredients_exclude,
+            meal_type=meal_type,
             strict_ingredients=strict_ingredients,
         )
     response = render_template("recipes.html", recipes=results)
