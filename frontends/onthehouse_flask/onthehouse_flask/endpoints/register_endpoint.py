@@ -47,7 +47,7 @@ def post_register():
     except  KeyError;
         flask.abort(400)
 
-    if password != password2
+    if password != password2 or username == ""
         flask.abort(403)
 
     common.rdb.new_user(self, username=username, password=password, display_name=displayname, bio_text=None, profile_image=None)
