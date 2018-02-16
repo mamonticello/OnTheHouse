@@ -3,18 +3,60 @@
 
 {% block head %}
     {{ super() }}
+    <style>
+    h3
+    {
+        font-family: Verdana;
+        font-size:24px;
+        color:#555555;
+    }
+    .boxed
+    {
+        border-radius: 10px;
+        background: #ee3333;
+        height: 25px;
+        padding-top: 2px;
+        padding-left: 8px;
+        font-family: Verdana;
+        color: #efefef
+    }
+    .recipe-author
+    {
+        font-family: Arial;
+        font-size:18px;
+    }
+    .recipe-author a
+    {
+        color:#ee3333
+    }
+    .recipe-ingredients
+    {
+        float: left;
+        width: 40%;
+    }
+    .recipe-instructions
+    {
+        float: right;
+        width: 60%;
+    }
+    .recipe-name
+    {
+        padding-top:50px;
+        font-family:Verdana;font-size:32px;color:#555555;text-shadow:2px 2px #dddddd
+    }
+    </style>
 {% endblock %}
 
 {% block body %}
     <div class="row content">
         <div class="col-sm-12">
-            <p class="recipe-name" style="padding-top:50px;font-family:Verdana;font-size:32px;color:#555555;text-shadow:2px 2px #dddddd">{{recipe.name}}</p>
+            <p class="recipe-name">{{recipe.name}}</p>
             <p><img class="img-rounded" src="/image/{{recipe.recipe_image_id}}"/></p>
             {% if recipe.author is not none %}
-            <p class="recipe-author" style="font-family:Arial;font-size:18px">Recipe by <a style="color:#ee3333" href="/user/{{recipe.author.username}}">{{recipe.author.display_name}}</a></p>
+            <p class="recipe-author">Recipe by <a href="/user/{{recipe.author.username}}">{{recipe.author.display_name}}</a></p>
             {% endif %}
             <hr>
-            <div class="boxed" style="border-radius:10px;background:#ee3333;height:25px;padding-top:2px;padding-left:8px;font-family:Verdana;color:#efefef">
+            <div class="boxed">
             <p id="infobar"></p>
             <script>
                 document.getElementById("infobar").innerHTML += {{recipe.meal_type|tojson}} + " | ";
@@ -26,35 +68,27 @@
             </script>
             
             </div>
-            <div style="margin:auto">
-                <div class="recipe-ingredients" style="float:left;width:40%;padding-top:25px"><span style=";font-family:Verdana;font-size:24px;color:#555555;">Ingredients</span>
-                    <hr>
-            {% set ingredients = recipe.get_ingredients() %}
-            {% if ingredients|length > 0 %}
-            <ul>
-              {% for quantitied in ingredients %}
-                <li>
-                  <a style="color:#ee3333" href="/recipe/search?ingredients={{quantitied.ingredient.name.replace(' ', '_')}}">
-                    {{-quantitied.quantity or ""-}} {{-quantitied.prefix or ""-}} {{-quantitied.ingredient.name-}} {{-quantitied.suffix or ""-}}
-                  </a>
-                </li>
-              {% endfor %}
-            </ul>
-            {% endif %}
-            <div style="float:right;width:60%;padding-top:25px"><img "/image/{{recipe.recipe_image_id}}"/></div>
-            </div></div>
-            <p class="recipe-instructions"><span style="font-family:Verdana;font-size:24px;color:#555555;">Instructions</span>
-                <hr>{{recipe.instructions}}</p>
-            <div class="boxed2" style="border-radius:10px;background:#ee3333;height:25px;padding-top:2px;padding-left:8px;font-family:Verdana;color:#efefef">
-            <p id="infobar2"></p>
-            <script>
-                document.getElementById("infobar2").innerHTML += {{recipe.meal_type|tojson}} + " | ";
-                if ({{recipe.prep_time}} >= 60) {
-                    document.getElementById("infobar2").innerHTML += "" + Math.trunc({{recipe.prep_time|tojson}} / 60) + " hr ";
-                }
-                document.getElementById("infobar2").innerHTML += "" + ({{recipe.prep_time|tojson}} % 60) + " min | ";
-                document.getElementById("infobar2").innerHTML += "Serves " + {{recipe.serving_size|tojson}};
-            </script>
+            <div class="recipe-ingredients">
+                <h3>Ingredients</h3>
+                {% set ingredients = recipe.get_ingredients() %}
+                {% if ingredients|length > 0 %}
+                <ul>
+                  {% for quantitied in ingredients %}
+                    <li>
+                      <a style="color:#ee3333" href="/recipe/search?ingredients={{quantitied.ingredient.name.replace(' ', '_')}}">
+                        {{-quantitied.quantity or ""-}} {{-quantitied.prefix or ""-}} {{-quantitied.ingredient.name-}} {{-quantitied.suffix or ""-}}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            <div class="recipe-instructions">
+                <h3>Instructions</h3>
+                {% set paragraphs = recipe.instructions|split_paragraphs %}
+                {% for paragraph in paragraphs %}
+                    <p>{{paragraph}}</p>
+                {% endfor %}
             </div>
         </div>
     </div>
