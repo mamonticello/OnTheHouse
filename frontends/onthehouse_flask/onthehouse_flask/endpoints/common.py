@@ -29,6 +29,7 @@ site.jinja_env.add_extension('jinja2.ext.do')
 site.jinja_env.trim_blocks = True
 site.jinja_env.lstrip_blocks = True
 site.jinja_env.filters['split_paragraphs'] = jinja_filters.split_paragraphs
+site.jinja_env.filters['divmod'] = divmod
 site.debug = True
 
 rdb = recipedb.RecipeDB()
