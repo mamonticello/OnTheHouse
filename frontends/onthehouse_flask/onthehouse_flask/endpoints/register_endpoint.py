@@ -17,7 +17,7 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = RegistrationForm()
-    if form.validate_on_submit():
+    if form.submit():
         user = User(username=form.username.data)
         user.set_displayname(form.displayname.data)
         user.set_password(form.password.data)
