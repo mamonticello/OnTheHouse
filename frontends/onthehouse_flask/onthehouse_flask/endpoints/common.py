@@ -34,10 +34,16 @@ site.jinja_env.filters['unix_to_human'] = jinja_filters.unix_to_human
 site.debug = True
 
 rdb = recipedb.RecipeDB()
-
+cookie_dict = {}
 
 def back_url():
     return request.args.get('goto') or request.referrer or '/'
+
+def new_user_cookie(cookie_value, user)
+    cookie_dict[cookie_value] = user
+
+def get_user_from_cookie(cookie_value)
+    return cookie_dict[cookie_value]
 
 def send_file(filepath, override_mimetype=None):
     '''

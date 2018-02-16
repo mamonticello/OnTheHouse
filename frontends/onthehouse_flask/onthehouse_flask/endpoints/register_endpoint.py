@@ -9,6 +9,7 @@ site = common.site
 
 
 COOKIE_MAX_AGE = 7 * 24 * 60 * 60
+COOKIE_NAME = 'cookie_name'
 
 @site.route('/login')
 @site.route('/register')
@@ -29,11 +30,13 @@ def post_login():
         flask.abort(403)
 
     response = jsonify.make_json_response({})
+    cookie_value = recipedb.helpers.random_hex(length=32)
     response.set_cookie(
-        'id',
-        value=recipedb.helpers.random_hex(length=32),
+        COOKIE_NAME,
+        value=cookie_value,
         max_age=COOKIE_MAX_AGE,
     )
+    new_user_cookie(cookie_value, user)
 
     return response
 
@@ -50,14 +53,17 @@ def post_register():
     if password != password2 or username == "":
         flask.abort(403)
 
-    common.rdb.new_user(self, username=username, password=password, display_name=displayname, bio_text=None, profile_image=None)
+    user = common.rdb.new_user(self, username=username, password=password, display_name=displayname, bio_text=None, profile_image=None)
 
     response = jsonify.make_json_response({})
+
+    cookie_value = recipedb.helpers.random_hex(length=32)
     response.set_cookie(
-        'id',
-        value=recipedb.helpers.random_hex(length=32),
+        COOKIE_NAME,
+        value=cookie_value,
         max_age=COOKIE_MAX_AGE,
     )
+    new_user_cookie(cookie_value, user)
 
     return response
 

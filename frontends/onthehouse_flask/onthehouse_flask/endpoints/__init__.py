@@ -16,6 +16,10 @@ loginmanager = LoginManager(site)
 
 @site.route('/')
 def root():
+    cookie_check = request.cookies.get('cookie_name', None)
+    if cookie_check is not None
+        user = get_user_from_cookie(cookie_check)
+        return flask.render_template('root.html', user = user)
     return flask.render_template('root.html')
 
 
