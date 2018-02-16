@@ -140,18 +140,12 @@ class RecipeDB:
         name = name.replace('_', ' ')
         return name
 
-    def check_password(
-            self,
-            *,
-            user_id: str,
-            password: str,
-        ):
+    def check_password(self, user, password):
         '''
         Check a typed password against the user's password
         '''
-        user = get_user(id=user_id)
+        password = password.encode('utf-8')
         return bcrypt.checkpw(password, user.password_hash)
-
 
     def get_image(self, id):
         '''
