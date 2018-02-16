@@ -9,7 +9,7 @@ site = common.site
 def get_user(username):
     user = common.rdb.get_user(username = username)
     recipes = common.rdb.search(author=user)
-    response = render_template("profile.html", user=user, recipes=recipes)
+    response = render_template("profile.html", user=user, recipes=recipes, session_user=common.get_session(request))
     return response
 
 
@@ -25,5 +25,5 @@ def get_profile_pic(username, ext=None):
 
 @site.route('/user')
 def user():
-    response = render_template("profile-test.html")
+    response = render_template("profile-test.html", session_user=common.get_session(request))
     return response

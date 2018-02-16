@@ -13,9 +13,14 @@
         <link rel="stylesheet" href="/static/common.css">
         <link rel="stylesheet" href="/static/profile.css">
         <link rel="stylesheet" href="/static/recipes.css">
+
     {% endblock %}
         <title>Home | OnTheHouse</title>
     <style>
+    #logo
+    {
+        width: 100%;
+    }
     </style>
 </head>
 
@@ -24,9 +29,9 @@
     <div class="container-fluid">
         <div class="row content">
             <div class="col-sm-3 sidenav">
-                <h4>OnTheHouse</h4>
+                <h4><a href="/"><img id="logo" src="/static/onthehouselogo.png" alt="On the House"/></a></h4>
                 {% if session_user %}
-                    <h5>Welcome, {{session_user.display_name}} </h5>
+                    <h5>Welcome, <a href="/user/{{session_user.username}}">{{session_user.display_name}}</a></h5>
                 {% endif %}
                 <ul id="nav-list" class="nav nav-pills nav-stacked">
                     <li><a href="/">Home</a></li>
