@@ -7,6 +7,7 @@ import recipedb
 from voussoirkit import pathclass
 
 from .. import jsonify
+from .. import jinja_filters
 
 
 root_dir = pathclass.Path(__file__).parent.parent.parent
@@ -27,6 +28,7 @@ site.config.update(
 site.jinja_env.add_extension('jinja2.ext.do')
 site.jinja_env.trim_blocks = True
 site.jinja_env.lstrip_blocks = True
+site.jinja_env.filters['split_paragraphs'] = jinja_filters.split_paragraphs
 site.debug = True
 
 rdb = recipedb.RecipeDB()
