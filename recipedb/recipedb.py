@@ -22,7 +22,7 @@ class RecipeDB:
     def __init__(
             self,
             data_directory=None,
-    ):
+        ):
         super().__init__()
 
         if data_directory is None:
@@ -105,6 +105,23 @@ class RecipeDB:
             with open(self.config_filepath.absolute_path, 'w') as handle:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
+
+    def _assert_valid_username(self, name):
+        '''
+        If something is wrong, raise an exception.
+        Otherwise do nothing.
+        '''
+        if len(name) < constants.USERNAME_MINLENGTH:
+            raise exceptions.UsernameTooShort(name=name, minlength=constants.USERNAME_MINLENGTH)
+
+        if len(name) > constants.USERNAME_MAXLENGTH:
+            raise exceptions.UsernameTooLong(name=name, maxlength=constants.USERNAME_MAXLENGTH)
+
+        badchars = set(character for character in name if character not in constants.USERNAME_CHARACTERS)
+
+        if len(badchars) > 0:
+            raise exceptions.InvalidUsernameCharacters(name=name, badchars=badchars)
+
 
     def _coerce_quantitied_ingredient(self, ingredient):
         '''
@@ -422,7 +439,7 @@ class RecipeDB:
             prep_time: int,
             serving_size: int,
             recipe_image: objects.Image,
-    ):
+        ):
         '''
         Add a new recipe to the database.
 
@@ -592,6 +609,8 @@ class RecipeDB:
         '''
         Register a new User to the database
         '''
+        self._assert_valid_username(username)
+
         try:
             self.get_user(username=username)
         except exceptions.NoSuchUser:
@@ -635,4 +654,3 @@ class RecipeDB:
         user = objects.User(self, user_data)
         self.log.debug('Created user %s with ID %s', user.username, user.id)
         return user
-

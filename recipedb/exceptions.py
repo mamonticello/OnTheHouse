@@ -48,6 +48,8 @@ class RecipeDBException(Exception, metaclass=ErrorTypeAdder):
         return self.error_type + '\n' + self.error_message
 
 
+################################################################################
+
 OUTOFDATE = '''
 Database is out of date. {current} should be {new}.
 Please use utilities\\database_upgrader.py
@@ -58,9 +60,26 @@ class DatabaseOutOfDate(RecipeDBException):
     '''
     error_message = OUTOFDATE
 
+################################################################################
 
 class AlreadyHasParent(RecipeDBException):
     error_message = 'Tag "{tag}" already has parent "{parent}"'
+
+################################################################################
+
+class InvalidUsername(RecipeDBException):
+    error_message = 'Username "{name}" is invalid.'
+
+class InvalidUsernameCharacters(InvalidUsername):
+    error_message = 'Username "{name}" contains invalid characters: {badchars}'
+
+class UsernameTooShort(InvalidUsername):
+    error_message = 'Username "{name}" is too short. Min is {minlength}'
+
+class UsernameTooLong(InvalidUsername):
+    error_message = 'Username "{name}" is too long. Max is {maxlength}'
+
+################################################################################
 
 class Exists(RecipeDBException):
     pass
@@ -74,6 +93,7 @@ class IngredientTagExists(Exists):
 class UserExists(Exists):
     error_message = 'User "{}" already exists.'
 
+################################################################################
 
 class NoSuch(RecipeDBException):
     pass
