@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+
+{% macro recipe_card(recipe, size ='m') %}
+    {% if size == 's' %}
+        <a href="/recipe/{{recipe.id}}/{{recipe.slug}}">
+            <img height="120" class="user-recipe-img" alt="Recipe Image" src="{{'/static/default_recipe_pic.jpg' if recipe.recipe_image_id is none else '/image/' + recipe.recipe_image_id }}">
+            <h4>{{ recipe.name }}</h4>
+        </a>
+            <h5>Added: {{ recipe.date_added|unix_to_human }}</h5>
+    {% elif size == 'm' %}
+        <a href="/recipe/{{recipe.id}}/{{recipe.slug}}">
+            <img height="240" class="user-recipe-img" alt="Recipe Image" src="{{'/static/default_recipe_pic.jpg' if recipe.recipe_image_id is none else '/image/' + recipe.recipe_image_id }}">
+            <h3>{{ recipe.name }}</h3>
+        </a>
+            <h4>Added: {{ recipe.date_added|unix_to_human }}</h4>
+    {% elif size == 'l' %}
+        <a href="/recipe/{{recipe.id}}/{{recipe.slug}}">
+            <img height = "400" class="user-recipe-img" alt="Recipe Image" src="{{'/static/default_recipe_pic.jpg' if recipe.recipe_image_id is none else '/image/' + recipe.recipe_image_id }}">
+            <h2>{{ recipe.name }}</h2>
+        </a>
+            <h3>Added: {{ recipe.date_added|unix_to_human }}</h3>
+    {% endif %}
+{% endmacro %}
+
+</html>
