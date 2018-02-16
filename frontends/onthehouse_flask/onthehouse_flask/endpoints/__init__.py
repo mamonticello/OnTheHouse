@@ -18,7 +18,7 @@ loginmanager = LoginManager(site)
 def root():
     cookie_check = request.cookies.get('cookie_name', None)
     if cookie_check is not None:
-        user = get_user_from_cookie(cookie_check)
+        user = common.get_user_from_cookie(cookie_check)
     else:
         user = None
     return flask.render_template('root.html', session_user = user)
