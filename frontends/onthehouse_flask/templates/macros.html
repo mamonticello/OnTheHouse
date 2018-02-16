@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 
+
 {% macro recipe_card(recipe, size ='m') %}
     {% if size == 's' %}
         <a href="/recipe/{{recipe.id}}/{{recipe.slug}}">
