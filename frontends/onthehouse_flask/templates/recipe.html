@@ -24,6 +24,10 @@
         font-family: Verdana;
         color: #efefef
     }
+    .ingredient-link
+    {
+        color:#ee3333;
+    }
     .recipe-author
     {
         font-family: Arial;
@@ -63,10 +67,10 @@
             <div class="boxed">
             <p id="infobar">
                 {% if recipe.meal_type %}
-                <a href="/recipe/search?meal_type={{recipe.meal_type}}">{{recipe.meal_type}}</a>
+                <a href="/recipe/search?meal_type={{recipe.meal_type}}">{{recipe.meal_type}}</a><span> | </span>
                 {% endif %}
                 {% set (hours, minutes) = recipe.prep_time|divmod(60) %}
-                <span>{{"%d hr " % hours if hours else ""}}{{"%d min" % minutes}}</span>
+                <span>{{"%d hr " % hours if hours else ""}}{{"%d min" % minutes}} | </span>
                 <span>Serves {{recipe.serving_size}}</span>
             </p>
             
@@ -78,7 +82,7 @@
                 <ul>
                   {% for quantitied in ingredients %}
                     <li>
-                      <a style="color:#ee3333" href="/recipe/search?ingredients={{quantitied.ingredient.name.replace(' ', '_')}}">
+                      <a class="ingredient-link" href="/recipe/search?ingredients={{quantitied.ingredient.name.replace(' ', '_')}}">
                         {{-quantitied.quantity or ""-}} {{-quantitied.prefix or ""-}} {{-quantitied.ingredient.name-}} {{-quantitied.suffix or ""-}}
                       </a>
                     </li>
