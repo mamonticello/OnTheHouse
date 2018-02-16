@@ -94,7 +94,7 @@
                 <h3>Instructions</h3>
                 {% set paragraphs = recipe.instructions|split_paragraphs %}
                 {% for paragraph in paragraphs %}
-                    <p>{{paragraph}}</p>
+                <p> <font size="+1">{{loop.index}}. </font> {{paragraph}}</p>
                 {% endfor %}
             </div>
         </div>
