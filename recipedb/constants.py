@@ -168,6 +168,7 @@ DEFAULT_IMAGEDIR = 'images'
 USERNAME_CHARACTERS = set(string.ascii_letters + string.digits + '_-')
 USERNAME_MAXLENGTH = 24
 USERNAME_MINLENGTH = 1
+PASSWORD_MINLENGTH = 1
 
 DEFAULT_CONFIGURATION = {
     'log_level': logging.DEBUG,

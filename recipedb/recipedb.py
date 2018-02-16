@@ -106,6 +106,14 @@ class RecipeDB:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
 
+    def _assert_valid_password(self, password):
+        '''
+        If something is wrong, raise an exception.
+        Otherwise do nothing.
+        '''
+        if len(password) < constants.PASSWORD_MINLENGTH:
+            raise exceptions.PasswordTooShort(minlength=constants.PASSWORD_MINLENGTH)
+
     def _assert_valid_username(self, name):
         '''
         If something is wrong, raise an exception.
@@ -121,7 +129,6 @@ class RecipeDB:
 
         if len(badchars) > 0:
             raise exceptions.InvalidUsernameCharacters(name=name, badchars=badchars)
-
 
     def _coerce_quantitied_ingredient(self, ingredient):
         '''
@@ -516,6 +523,7 @@ class RecipeDB:
         Register a new User to the database
         '''
         self._assert_valid_username(username)
+        self._assert_valid_password(password)
 
         try:
             self.get_user(username=username)

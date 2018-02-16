@@ -63,7 +63,7 @@ class DatabaseOutOfDate(RecipeDBException):
 ################################################################################
 
 class AlreadyHasParent(RecipeDBException):
-    error_message = 'Tag "{tag}" already has parent "{parent}"'
+    error_message = 'Tag "{tag}" already has parent "{parent}".'
 
 ################################################################################
 
@@ -71,13 +71,19 @@ class InvalidUsername(RecipeDBException):
     error_message = 'Username "{name}" is invalid.'
 
 class InvalidUsernameCharacters(InvalidUsername):
-    error_message = 'Username "{name}" contains invalid characters: {badchars}'
+    error_message = 'Username "{name}" contains invalid characters: {badchars}.'
 
 class UsernameTooShort(InvalidUsername):
-    error_message = 'Username "{name}" is too short. Min is {minlength}'
+    error_message = 'Username "{name}" is too short. Min is {minlength}.'
 
 class UsernameTooLong(InvalidUsername):
-    error_message = 'Username "{name}" is too long. Max is {maxlength}'
+    error_message = 'Username "{name}" is too long. Max is {maxlength}.'
+
+class InvalidPassword(RecipeDBException):
+    error_message = 'Password is invalid.'
+
+class PasswordTooShort(InvalidPassword):
+    error_message = 'Password is too short. Min is {minlength}.'
 
 ################################################################################
 
