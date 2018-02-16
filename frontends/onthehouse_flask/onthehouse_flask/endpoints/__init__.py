@@ -16,7 +16,12 @@ loginmanager = LoginManager(site)
 
 @site.route('/')
 def root():
-    return flask.render_template('root.html')
+    cookie_check = request.cookies.get('cookie_name', None)
+    if cookie_check is not None
+        user = get_user_from_cookie(cookie_check)
+    else 
+        user = None
+    return flask.render_template('root.html', user = user)
 
 
 @site.route('/img/<imgid>')
