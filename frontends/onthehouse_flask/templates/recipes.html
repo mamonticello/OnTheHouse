@@ -9,16 +9,20 @@
 {% import 'macros.html' as macros%}
 
 {% block body %}
-    <div class="row content">
-        <div class="col-sm">
-            {% for recipe in recipes %}
-            <div class="col-sm-3">
-                <br>
-                {{ macros.recipe_card(recipe,'s') }}
+<div class="row content">
+    <div class="col-sm-12">
+        <div class="row content">
+            <div class="col-sm">
+                {% for recipe in recipes %}
+                <div class="col-sm-3" style="overflow: hidden;white-space: nowrap;">
+                    <br>
+                    {{ macros.recipe_card(recipe,'s') }}
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
     </div>
+</div>
 {% endblock %}
 <
 {% block footer %} {{ super() }} {% endblock %}
