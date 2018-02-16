@@ -70,7 +70,7 @@
                 <a href="/recipe/search?meal_type={{recipe.meal_type}}">{{recipe.meal_type}}</a><span> | </span>
                 {% endif %}
                 {% set (hours, minutes) = recipe.prep_time|divmod(60) %}
-                <span>{{"%d hr " % hours if hours else ""}}{{"%d min" % minutes}} | </span>
+                <span>{{"%d hr " % hours if hours else ""}}{{"%d min" % minutes if minutes else ""}} | </span>
                 <span>Serves {{recipe.serving_size}}</span>
             </p>
             
