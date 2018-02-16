@@ -6,15 +6,14 @@
 
 {% endblock %}
 
+{% import 'macros.html' as macros%}
+
 {% block body %}
     <div class="row content">
         <div class="col-sm-12">
             {% for recipe in recipes %}
             <div class="col-sm-12">
-                <a href="/recipe/{{recipe.id}}/{{recipe.slug}}" class="recipe-name">
-                  <img src="/image/{{recipe.recipe_image_id}}" height="120px"/>
-                  {{ recipe.name }}
-                </a>
+                {{ macros.recipe_card(recipe) }}
             </div>
             {% endfor %}
         </div>
