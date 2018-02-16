@@ -22,7 +22,7 @@ class RecipeDB:
     def __init__(
             self,
             data_directory=None,
-    ):
+        ):
         super().__init__()
 
         if data_directory is None:
@@ -105,6 +105,30 @@ class RecipeDB:
             with open(self.config_filepath.absolute_path, 'w') as handle:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
+
+    def _assert_valid_password(self, password):
+        '''
+        If something is wrong, raise an exception.
+        Otherwise do nothing.
+        '''
+        if len(password) < constants.PASSWORD_MINLENGTH:
+            raise exceptions.PasswordTooShort(minlength=constants.PASSWORD_MINLENGTH)
+
+    def _assert_valid_username(self, name):
+        '''
+        If something is wrong, raise an exception.
+        Otherwise do nothing.
+        '''
+        if len(name) < constants.USERNAME_MINLENGTH:
+            raise exceptions.UsernameTooShort(name=name, minlength=constants.USERNAME_MINLENGTH)
+
+        if len(name) > constants.USERNAME_MAXLENGTH:
+            raise exceptions.UsernameTooLong(name=name, maxlength=constants.USERNAME_MAXLENGTH)
+
+        badchars = set(character for character in name if character not in constants.USERNAME_CHARACTERS)
+
+        if len(badchars) > 0:
+            raise exceptions.InvalidUsernameCharacters(name=name, badchars=badchars)
 
     def _coerce_quantitied_ingredient(self, ingredient):
         '''
@@ -422,7 +446,7 @@ class RecipeDB:
             prep_time: int,
             serving_size: int,
             recipe_image: objects.Image,
-    ):
+        ):
         '''
         Add a new recipe to the database.
 
@@ -485,6 +509,65 @@ class RecipeDB:
         recipe = objects.Recipe(self, recipe_data)
         self.log.debug('Created recipe %s', recipe.name)
         return recipe
+
+    def new_user(
+            self,
+            username: str,
+            password: str,
+            *,
+            display_name: str=None,
+            bio_text: str=None,
+            profile_image: objects.Image=None,
+        ):
+        '''
+        Register a new User to the database
+        '''
+        self._assert_valid_username(username)
+        self._assert_valid_password(password)
+
+        try:
+            self.get_user(username=username)
+        except exceptions.NoSuchUser:
+            pass
+        else:
+            raise exceptions.UserExists(username)
+
+        cur = self.sql.cursor()
+
+        user_id = helpers.random_hex()
+        password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        date_joined = helpers.now()
+
+        if not display_name:
+            display_name = username
+
+        if not bio_text:
+            bio_text = ''
+
+        if profile_image is not None:
+            profile_image_id = profile_image.id
+        else:
+            profile_image_id = None
+
+        user_data = {
+            'UserID': user_id,
+            'Username': username,
+            'DisplayName': display_name,
+            'PasswordHash': password_hash,
+            'BioText': bio_text,
+            'DateJoined': date_joined,
+            'ProfileImageID': profile_image_id,
+        }
+
+        (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_USER_COLUMNS, user_data)
+        query = 'INSERT INTO User VALUES(%s)' % qmarks
+        cur.execute(query, bindings)
+
+        self.sql.commit()
+
+        user = objects.User(self, user_data)
+        self.log.debug('Created user %s with ID %s', user.username, user.id)
+        return user
 
     def search(
             self,
@@ -579,60 +662,3 @@ class RecipeDB:
         results = sorted(match_counts.keys(), key=match_counts.get, reverse=True)
 
         return results
-
-    def new_user(
-            self,
-            username: str,
-            password: str,
-            *,
-            display_name: str=None,
-            bio_text: str=None,
-            profile_image: objects.Image=None,
-        ):
-        '''
-        Register a new User to the database
-        '''
-        try:
-            self.get_user(username=username)
-        except exceptions.NoSuchUser:
-            pass
-        else:
-            raise exceptions.UserExists(username)
-
-        cur = self.sql.cursor()
-
-        user_id = helpers.random_hex()
-        password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        date_joined = helpers.now()
-
-        if not display_name:
-            display_name = username
-
-        if not bio_text:
-            bio_text = ''
-
-        if profile_image is not None:
-            profile_image_id = profile_image.id
-        else:
-            profile_image_id = None
-
-        user_data = {
-            'UserID': user_id,
-            'Username': username,
-            'DisplayName': display_name,
-            'PasswordHash': password_hash,
-            'BioText': bio_text,
-            'DateJoined': date_joined,
-            'ProfileImageID': profile_image_id,
-        }
-
-        (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_USER_COLUMNS, user_data)
-        query = 'INSERT INTO User VALUES(%s)' % qmarks
-        cur.execute(query, bindings)
-
-        self.sql.commit()
-
-        user = objects.User(self, user_data)
-        self.log.debug('Created user %s with ID %s', user.username, user.id)
-        return user
-
