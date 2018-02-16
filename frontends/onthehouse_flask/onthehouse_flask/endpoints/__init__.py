@@ -8,6 +8,8 @@ from . import image_endpoint
 from . import profile_endpoint
 from . import recipe_endpoint
 from . import register_endpoint
+from . import login_endpoint
+
 
 site = common.site
 loginmanager = LoginManager(site)
