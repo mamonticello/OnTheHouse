@@ -28,14 +28,14 @@ def normalize_ingredients(text):
 @site.route('/recipe/<recipeid>/<slug>')
 def get_recipe(recipeid, slug=None):
     recipe = common.rdb.get_recipe(recipeid)
-    response = render_template("recipe.html", recipe=recipe)
+    response = render_template("recipe.html", recipe=recipe, session_user=common.get_session(request))
     return response
 
 
 @site.route('/recipe')
 def recipes():
     recipes = common.rdb.get_recipes()
-    response = render_template("recipes.html", recipes=recipes)
+    response = render_template("recipes.html", recipes=recipes, session_user=common.get_session(request))
     return response
 
 
@@ -61,5 +61,5 @@ def recipes_search():
             meal_type=meal_type,
             strict_ingredients=strict_ingredients,
         )
-    response = render_template("recipes.html", recipes=results)
+    response = render_template("recipes.html", recipes=results, session_user=common.get_session(request))
     return response
