@@ -1,0 +1,100 @@
+{% extends "root.html" %}
+{% block title %} PROFILE {% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block body %}
+            <div class="row content">
+                <div class="col-sm-12 profile">
+                    <div class ="col-sm-4 pic">
+                        <img class="img-rounded" width="100%" src="static/default_profile_pic.jpg" alt="Profile picture">
+                    </div>
+                    <div class="col-sm-6">
+                        <h2 style="margin=50px 30px 20px 0px;" class="well">John Doe</h2>
+                        <h4 id="join-date">Member Since January 1, 1970</h4>
+                        <p id="bio" class="well well-lg">Bio</p>
+                    </div>
+                    <div class="col-sm-2"></div>
+                <div class="col-sm-12"></div>
+
+                <div class="row">
+                    <div class="col-sm-12 user-recipes">
+                        <h2 style="text-align:center;">User Recipes</h2>
+                    </div>
+
+                    <div class="col-sm-12" style="margin-top: 50px"></div>
+
+
+
+                        <!--TESTING-->
+
+                         <div class="col-sm-3 user-recipe box">
+                             <a href="#">
+                                  <div class="well col-sm-12 well">
+                                      <img class="box" src="static/default_recipe_pic.jpg" alt="Recipe Image">
+                                      <h3>Clam Chowder</h3>
+                                      <h4>Added June 21, 2015</h4>
+                                  </div>
+                             </a>
+                         </div>
+
+                         <div class="col-sm-3 user-recipe box">
+                             <a href="#">
+                                  <div class="well col-sm-12 well">
+                                      <img class="box" src="static/default_recipe_pic.jpg" alt="Recipe Image">
+                                      <h3>Clam Chowder</h3>
+                                      <h4>Added June 21, 2015</h4>
+                                  </div>
+                             </a>
+                         </div>
+
+
+                         <div class="col-sm-3 user-recipe box">
+                             <a href="#">
+                                  <div class="well col-sm-12 well">
+                                      <img class="box" src="static/default_recipe_pic.jpg" alt="Recipe Image">
+                                      <h3>Clam Chowder</h3>
+                                      <h4>Added June 21, 2015</h4>
+                                  </div>
+                             </a>
+                         </div>
+
+
+                         <div class="col-sm-3 user-recipe box">
+                             <a href="#">
+                                  <div class="well col-sm-12 well">
+                                      <img class="box" src="static/default_recipe_pic.jpg" alt="Recipe Image">
+                                      <h3>Clam Chowder</h3>
+                                      <h4>Added June 21, 2015</h4>
+                                  </div>
+                             </a>
+                         </div>
+
+                         <div class="col-sm-3 user-recipe box">
+                             <a href="#">
+                                  <div class="well col-sm-12 well">
+                                      <img class="box" src="static/default_recipe_pic.jpg" alt="Recipe Image">
+                                      <h3>Clam Chowder</h3>
+                                      <h4>Added June 21, 2015</h4>
+                                  </div>
+                             </a>
+                         </div>
+                        <!--TESTING-->
+
+
+
+                        {% for recipe in recipes %}
+                            <div class="col-sm-4 user-recipe">
+                                <img class="user-recipe-img" alt="Recipe Image">
+                                <h3>{{ recipe.name }}</h3>
+                                <h4>{{ recipe.date_added }}</h4>
+                            </div>
+                        {% endfor %}
+                </div>
+                </div>
+            </div>
+{% endblock %}
+
+{% block footer %} {{ super() }} {% endblock %}

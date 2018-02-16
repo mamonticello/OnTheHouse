@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "root.html" %}
 
 {% block content %}
     <h1>Register</h1>
@@ -11,6 +11,14 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+        <p>
+            {{ form.displayname.label }}<br>
+            {{ form.displayname(size=32) }}<br>
+            {% for error in form.displayname.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
             {{ form.password.label }}<br>
             {{ form.password(size=32) }}<br>
             {% for error in form.password.errors %}

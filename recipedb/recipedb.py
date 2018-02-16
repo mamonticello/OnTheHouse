@@ -106,7 +106,7 @@ class RecipeDB:
                 handle.write(json.dumps(config, indent=4, sort_keys=True))
         return config
 
-    def _normalize_ingredient(self, ingredient):
+    def _coerce_quantitied_ingredient(self, ingredient):
         '''
         Try to convert the given input to a QuantitiedIngredient.
         '''
@@ -132,6 +132,27 @@ class RecipeDB:
 
         return ingredient
 
+    def _normalize_ingredient_name(self, name):
+        '''
+        Apply any normalization rules that bring multiple equivalent forms
+        of an ingredient name to a single, consistent form.
+        '''
+        name = name.replace('_', ' ')
+        return name
+
+    def check_password(
+            self,
+            *,
+            user_id: str,
+            password: str,
+        ):
+        '''
+        Check a typed password against the user's password
+        '''
+        user = get_user(id=user_id)
+        return bcrypt.checkpw(password, user.password_hash)
+
+
     def get_image(self, id):
         '''
         Fetch an image by its ID
@@ -152,57 +173,87 @@ class RecipeDB:
         except exceptions.NoSuchIngredient:
             return self.new_ingredient(name)
 
-    def get_ingredient(
-            self,
-            *,
-            id=None,
-            name=None,
-        ):
+    def get_ingredient(self, *, id=None, name=None):
         '''
         Fetch a single Ingredient by its ID or name.
         '''
         if id is None and name is None:
             raise TypeError('id and name can\'t both be None.')
 
-        cur = self.sql.cursor()
         if id is not None:
-            # fetch by ID
-            cur.execute('SELECT * FROM Ingredient WHERE IngredientID = ?', [id])
-            ingredient_row = cur.fetchone()
+            ingredient = self.get_ingredient_by_id(id)
         else:
-            # fetch by Name
-            # make sure to check the autocorrect table first.
-            cur.execute('SELECT * FROM Ingredient WHERE Name = ?', [name])
-            ingredient_row = cur.fetchone()
-
-        if ingredient_row is None:
-            raise exceptions.NoSuchIngredient(id or name)
-
-        ingredient = objects.Ingredient(self, ingredient_row)
+            ingredient = self.get_ingredient_by_name(name)
 
         return ingredient
 
-    def get_ingredient_tag(
-            self,
-            *,
-            id=None,
-            name=None,
-    ):
+    def get_ingredient_by_id(self, id):
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM Ingredient WHERE IngredientID = ?', [id])
+        ingredient_row = cur.fetchone()
+
+        if ingredient_row is None:
+            raise exceptions.NoSuchIngredient('ID: ' + id)
+
+        ingredient = objects.Ingredient(self, ingredient_row)
+        return ingredient
+
+    def get_ingredient_by_name(self, name):
+        name = self._normalize_ingredient_name(name)
+        cur = self.sql.cursor()
+
+        cur.execute('SELECT IngredientID FROM IngredientAutocorrect WHERE AlternateName = ?', [name])
+        ingredient_row = cur.fetchone()
+
+        if ingredient_row is not None:
+            return self.get_ingredient_by_id(ingredient_row[0])
+
+        cur.execute('SELECT * FROM Ingredient WHERE Name = ?', [name])
+        ingredient_row = cur.fetchone()
+
+        if ingredient_row is None:
+            raise exceptions.NoSuchIngredient('Name: ' + name)
+
+        ingredient = objects.Ingredient(self, ingredient_row)
+        return ingredient
+
+    def get_ingredient_tag(self, *, id=None, name=None):
         '''
         Fetch a single IngredientTag by its ID or name.
         '''
         if id is None and name is None:
             raise TypeError('id and name can\'t both be None.')
 
-        cur = self.sql.cursor()
         if id is not None:
-            # fetch by ID
-            pass
+            tag = self.get_ingredient_tag_by_id(id)
         else:
-            # fetch by Name
-            pass
+            tag = self.get_ingredient_tag_by_name(name)
 
-        raise NotImplementedError
+        return tag
+
+    def get_ingredient_tag_by_id(self, id):
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM IngredientTag WHERE IngredientTagID = ?', [id])
+        tag_row = cur.fetchone()
+
+        if tag_row is None:
+            raise exceptions.NoSuchIngredientTag('ID: ' + id)
+
+        tag = objects.IngredientTag(self, tag_row)
+        return tag
+
+    def get_ingredient_tag_by_name(self, name):
+        name = self._normalize_ingredient_name(name)
+
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM IngredientTag WHERE TagName = ?', [name])
+        tag_row = cur.fetchone()
+
+        if tag_row is None:
+            raise exceptions.NoSuchIngredientTag('Name: ' + name)
+
+        tag = objects.IngredientTag(self, tag_row)
+        return tag
 
     def get_recipe(self, id):
         '''
@@ -228,6 +279,50 @@ class RecipeDB:
         recipe_rows = cur.fetchall()
         recipe_objects = [objects.Recipe(self, row) for row in recipe_rows]
         return recipe_objects
+
+    def get_user(self, *, id=None, username=None):
+        '''
+        Fetch an user by their ID
+        '''
+        if id is None and username is None:
+            raise TypeError('id and username can\'t both be None.')
+
+        if id is not None:
+            user = self.get_user_by_id(id)
+        else:
+            user = self.get_user_by_username(username)
+
+        return user
+
+    def get_user_by_id(self, id):
+        '''
+        Fetch an user by their ID
+        '''
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM User WHERE UserID = ?', [id])
+        user_row = cur.fetchone()
+
+        if user_row is not None:
+            user = objects.User(self, user_row)
+        else:
+            raise exceptions.NoSuchUser('ID:' + id)
+
+        return user
+    
+    def get_user_by_username(self, username):
+        '''
+        Fetch an user by their username
+        '''
+        cur = self.sql.cursor()
+        cur.execute('SELECT * FROM User Where Username = ?', [username])
+        user_row = cur.fetchone()
+
+        if user_row is not None:
+            user = objects.User(self, user_row)
+        else:
+            raise exceptions.NoSuchUser('Name: ' + username)
+
+        return user
 
     def new_image(self, filepath):
         '''
@@ -262,13 +357,15 @@ class RecipeDB:
         '''
         Add a new Ingredient to the database.
         '''
-        # Check if this name is already taken by the autocorrect or other ing.
-        # - if so, raise an exception.
+        name = self._normalize_ingredient_name(name)
+        try:
+            self.get_ingredient_by_name(name)
+        except exceptions.NoSuchIngredient:
+            pass
+        else:
+            raise exceptions.IngredientExists(name)
+
         cur = self.sql.cursor()
-        cur.execute('SELECT * FROM Ingredient WHERE name = ?', [name])
-        ingredient_row = cur.fetchone()
-        if ingredient_row is not None:
-            raise ValueError('Ingredient %s already exists' % name)
 
         data = {
             'IngredientID': helpers.random_hex(),
@@ -288,7 +385,34 @@ class RecipeDB:
         '''
         Create a new IngredientTag, either a root or grouped under `parent`.
         '''
-        raise NotImplementedError
+        name = self._normalize_ingredient_name(name)
+        try:
+            self.get_ingredient_tag_by_name(name)
+        except exceptions.NoSuchIngredientTag:
+            pass
+        else:
+            raise exceptions.IngredientTagExists(name)
+
+        if parent is not None:
+            parent_id = parent.id
+        else:
+            parent_id = None
+
+        data = {
+            'IngredientTagID': helpers.random_hex(),
+            'TagName': name,
+            'ParentTagID': parent_id,
+        }
+
+        cur = self.sql.cursor()
+        (qmarks, bindings) = sqlhelpers.insert_filler(constants.SQL_INGREDIENTTAG_COLUMNS, data)
+        query = 'INSERT INTO IngredientTag VALUES(%s)' % qmarks
+        cur.execute(query, bindings)
+        self.sql.commit()
+
+        tag = objects.IngredientTag(self, data)
+        self.log.debug('Created IngredientTag %s', tag.name)
+        return tag
 
     def new_recipe(
             self,
@@ -345,7 +469,7 @@ class RecipeDB:
         query = 'INSERT INTO Recipe VALUES(%s)' % qmarks
         cur.execute(query, bindings)
 
-        ingredients = [self._normalize_ingredient(ingredient) for ingredient in ingredients]
+        ingredients = [self._coerce_quantitied_ingredient(ingredient) for ingredient in ingredients]
 
         for quant_ingredient in ingredients:
             recipe_ingredient_data = {
@@ -426,11 +550,10 @@ class RecipeDB:
 
         query = 'SELECT * FROM Recipe {wheres}'
         query = query.format(wheres=wheres)
-        self.log.debug(query)
-        self.log.debug(bindings)
+        self.log.debug("%s %s", query, bindings)
         cur.execute(query, bindings)
 
-        results = []
+        match_counts = {}
         while True:
             recipe_row = cur.fetchone()
             if recipe_row is None:
@@ -443,36 +566,56 @@ class RecipeDB:
                 continue
 
             if ingredients:
-                if strict_ingredients:
-                    if not recipe_ingredients.issubset(ingredients):
-                        continue
-                else:
-                    if not recipe_ingredients.intersection(ingredients):
-                        continue
+                matches = recipe_ingredients.intersection(ingredients)
 
-            results.append(recipe)
-            if limit is not None and len(results) >= limit:
+                if not matches:
+                    continue
+
+                if strict_ingredients and matches != ingredients:
+                    # Recipe must contain all of our search.
+                    continue
+
+                match_counts[recipe] = len(matches)
+            else:
+                match_counts[recipe] = 1
+
+            if limit is not None and len(match_counts) >= limit:
                 break
+
+        results = sorted(match_counts.keys(), key=match_counts.get, reverse=True)
 
         return results
 
     def new_user(
             self,
-            *,
             username: str,
-            display_name: str,
             password: str,
-            bio_text: str,
-            profile_image: objects.Image
+            *,
+            display_name: str=None,
+            bio_text: str=None,
+            profile_image: objects.Image=None,
         ):
         '''
         Register a new User to the database
         '''
+        try:
+            self.get_user(username=username)
+        except exceptions.NoSuchUser:
+            pass
+        else:
+            raise exceptions.UserExists(username)
+
         cur = self.sql.cursor()
 
         user_id = helpers.random_hex()
         password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         date_joined = helpers.now()
+
+        if not display_name:
+            display_name = username
+
+        if not bio_text:
+            bio_text = ''
 
         if profile_image is not None:
             profile_image_id = profile_image.id
@@ -496,39 +639,6 @@ class RecipeDB:
         self.sql.commit()
 
         user = objects.User(self, user_data)
-        self.log.debug('Created user %s', user.username)
+        self.log.debug('Created user %s with ID %s', user.username, user.id)
         return user
 
-    def get_user(self, *, id=None, username=None):
-        '''
-        Fetch an user by their ID
-        '''
-        if id is None and username is None:
-            raise TypeError('id and username can\'t both be None.')
-
-        cur = self.sql.cursor()
-        if id is not None:
-            cur.execute('SELECT * FROM User WHERE UserID = ?', [id])
-            user_row = cur.fetchone()
-        else:
-            cur.execute('SELECT * FROM User Where Username = ?', [username])
-            user_row = cur.fetchone()
-
-        if user_row is not None:
-            user = objects.User(self, user_row)
-        else:
-            raise ValueError('User %s does not exist' % id)
-
-        return user
-
-    def check_password(
-            self,
-            *,
-            user_id: str,
-            password: str,
-        ):
-        '''
-        Check a typed password against the user's password
-        '''
-        user = get_user(id=user_id)
-        return bcrypt.checkpw(password, user.password_hash)

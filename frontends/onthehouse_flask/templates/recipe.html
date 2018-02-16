@@ -1,83 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>{{ recipe.name }} | OnTheHouse</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <style>
-    /* Set height of the grid so .sidenav can be 100% (adjust if needed) */
-    .row.content {height: 1500px}
+{% extends "root.html" %}
+{% block title %} {{ recipe.name }} {% endblock %}
 
-    /* Set gray background color and 100% height */
-    .sidenav {
-      background-color: #f1f1f1;
-      height: 100%;
-    }
+{% block head %}
+    {{ super() }}
+{% endblock %}
 
-    /* Set black background color, white text and some padding */
-    footer {
-      background-color: #555;
-      color: white;
-      padding: 15px;
-    }
-
-    /* On small screens, set height to 'auto' for sidenav and grid */
-    @media screen and (max-width: 767px) {
-      .sidenav {
-        height: auto;
-        padding: 15px;
-      }
-      .row.content {height: auto;}
-    }
-  </style>
-</head>
-<body>
-
-<div class="container-fluid">
-  <div class="row content">
-    <div class="col-sm-3 sidenav">
-      <h4>OnTheHouse Recipes</h4>
-      <ul class="nav nav-pills nav-stacked">
-        <li class="active"><a href="/recipe">Home</a></li>
-        <li><a href="#section2">Explore</a></li>
-        <li><a href="#section3">Diets</a></li>
-        <li><a href="#section3">The Team</a></li>
-      </ul><br>
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search Recipes..">
-        <span class="input-group-btn">
-          <button class="btn btn-default" type="button">
-            <span class="glyphicon glyphicon-search"></span>
-          </button>
-        </span>
-      </div>
-    </div>
-	<div class="col-sm-9">
-        <div class="row content">
-            <div class="col-sm-12">
-                <h2 class="recipe-name">Name = {{ recipe.name }}</h2>
-                <h3 class="recipe-id">Recipe ID = {{ recipe.id}} </h3>
-                <h3 class="recipe-country">Country Of Origin = {{ recipe.country}} </h3>
-                <h3 class="recipe-meal-type">Meal Type = {{ recipe.meal_type}} </h3>
-                <h3 class="recipe-cuisine">Cuisine = {{ recipe.cuisine}} </h3>
-                <h3 class="recipe-prep-time">Prep Time = {{ recipe.prep_time}} </h3>
-                <h3 class="recipe-date-added">Date Added = {{ recipe.date_added}} </h3>
-                <h3 class="recipe-date-mod">Date Modified = {{ recipe.date_mod}} </h3>
-                <h3 class="recipe-blurb">blurb = {{ recipe.blurb}} </h3>
-                <h3 class="recipe-servings">serving_size = {{ recipe.serving_size}} </h3>
-                <h3 class="recipe-instructions">instructions = {{ recipe.instructions}} </h3>
+{% block body %}
+    <div class="row content">
+        <div class="col-sm-12">
+            <p class="recipe-name" style="padding-top:50px;font-family:Verdana;font-size:32px;color:#555555;text-shadow:2px 2px #dddddd">{{recipe.name}}</p>
+            <p><img class="img-rounded" src="/image/{{recipe.recipe_image_id}}"/></p>
+            {% if recipe.author is not none %}
+            <p class="recipe-author" style="font-family:Arial;font-size:18px">Recipe by <a style="color:#ee3333" href="/user/{{recipe.author.username}}">{{recipe.author.display_name}}</a></p>
+            {% endif %}
+            <hr>
+            <div class="boxed" style="border-radius:10px;background:#ee3333;height:25px;padding-top:2px;padding-left:8px;font-family:Verdana;color:#efefef">
+            <p id="infobar"></p>
+            <script>
+                document.getElementById("infobar").innerHTML += {{recipe.meal_type|tojson}} + " | ";
+                if ({{recipe.prep_time|tojson}} >= 60) {
+                    document.getElementById("infobar").innerHTML += "" + Math.trunc({{recipe.prep_time|tojson}} / 60) + " hr ";
+                }
+                document.getElementById("infobar").innerHTML += "" + ({{recipe.prep_time|tojson}} % 60) + " min | ";
+                document.getElementById("infobar").innerHTML += "Serves " + {{recipe.serving_size|tojson}};
+            </script>
+            
+            </div>
+            <div style="margin:auto">
+                <div class="recipe-ingredients" style="float:left;width:40%;padding-top:25px"><span style=";font-family:Verdana;font-size:24px;color:#555555;">Ingredients</span>
+                    <hr>
+            {% set ingredients = recipe.get_ingredients() %}
+            {% if ingredients|length > 0 %}
+            <ul>
+              {% for quantitied in ingredients %}
+                <li>
+                  <a style="color:#ee3333" href="/recipe/search?ingredients={{quantitied.ingredient.name.replace(' ', '_')}}">
+                    {{-quantitied.quantity or ""-}} {{-quantitied.prefix or ""-}} {{-quantitied.ingredient.name-}} {{-quantitied.suffix or ""-}}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            <div style="float:right;width:60%;padding-top:25px"><img "/image/{{recipe.recipe_image_id}}"/></div>
+            </div></div>
+            <p class="recipe-instructions"><span style="font-family:Verdana;font-size:24px;color:#555555;">Instructions</span>
+                <hr>{{recipe.instructions}}</p>
+            <div class="boxed2" style="border-radius:10px;background:#ee3333;height:25px;padding-top:2px;padding-left:8px;font-family:Verdana;color:#efefef">
+            <p id="infobar2"></p>
+            <script>
+                document.getElementById("infobar2").innerHTML += {{recipe.meal_type|tojson}} + " | ";
+                if ({{recipe.prep_time}} >= 60) {
+                    document.getElementById("infobar2").innerHTML += "" + Math.trunc({{recipe.prep_time|tojson}} / 60) + " hr ";
+                }
+                document.getElementById("infobar2").innerHTML += "" + ({{recipe.prep_time|tojson}} % 60) + " min | ";
+                document.getElementById("infobar2").innerHTML += "Serves " + {{recipe.serving_size|tojson}};
+            </script>
             </div>
         </div>
-	</div>
- </div>
-</div>
+    </div>
+{% endblock %}
 
-<footer class="container-fluid">
-  <p>2018 Delta Co.</p>
-</footer>
-
-</body>
-</html>
+{% block footer %} {{ super() }} {% endblock %}

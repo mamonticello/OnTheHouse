@@ -49,7 +49,7 @@ CREATE INDEX IF NOT EXISTS index_IngredientAutocorrect_AlternateName on Ingredie
 ----------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS IngredientTag(
     IngredientTagID TEXT PRIMARY KEY,
-    TagName TEXT,
+    TagName TEXT COLLATE NOCASE,
     ParentTagID TEXT
 );
 ----------------------------------------------------------------------------------------------------
@@ -148,7 +148,9 @@ def _extract_column_names(table):
 
 SQL_IMAGE_COLUMNS = _extract_column_names('Image')
 SQL_INGREDIENT_COLUMNS = _extract_column_names('Ingredient')
+SQL_INGREDIENTAUTOCORRECT_COLUMNS = _extract_column_names('IngredientAutocorrect')
 SQL_INGREDIENTTAG_COLUMNS = _extract_column_names('IngredientTag')
+SQL_INGREDIENTINGREDIENTTAG_COLUMNS = _extract_column_names('Ingredient_IngredientTag_Map')
 SQL_RECIPE_COLUMNS = _extract_column_names('Recipe')
 SQL_RECIPEINGREDIENT_COLUMNS = _extract_column_names('Recipe_Ingredient_Map')
 SQL_REVIEW_COLUMNS = _extract_column_names('Review')

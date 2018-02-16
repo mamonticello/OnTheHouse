@@ -1,0 +1,42 @@
+{% extends "root.html" %}
+{% block title %} {{ user.display_name }} {% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block body %}
+    <div class="row content">
+        <div class="col-sm-12 profile">
+            <div class ="col-sm-4 pic">
+                <img class="img-rounded" width="100%" src="/static/default_profile_pic.jpg" alt="Profile picture">
+            </div>
+            <div class="col-sm-6">
+                <h2 style="margin: 50px 30px 20px 0px;" class="well"> {{ user.display_name }} </h2>
+                <h4 id="join-date">Member Since {{ user.date_joined }}</h4>
+                <p id="bio" class="well well-lg">{{ user.bio_text }}</p>
+            </div>
+            <div class="col-sm-2"></div>
+        <div class="col-sm-12"></div>
+
+        <div class="row">
+            <div class="col-sm-12 user-recipes">
+                <h2 style="text-align:center;">User Recipes</h2>
+            </div>
+
+            <div class="col-sm-12" style="margin-top: 50px"></div>
+            {% for recipe in recipes %}
+                <div class="col-sm-4 user-recipe">
+                <a href="/recipe/{{recipe.id}}/{{recipe.slug}}"> 
+                    <img class="user-recipe-img" alt="Recipe Image" src="{{'/static/default_recipe_pic.jpg' if recipe.recipe_image_id is none else '/image/' + recipe.recipe_image_id }}">
+                    <h3>{{ recipe.name }}</h3>
+                </a>
+                    <h4>Added: {{ recipe.date_added }}</h4>
+                </div>
+            {% endfor %}
+        </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %} {{ super() }} {% endblock %}

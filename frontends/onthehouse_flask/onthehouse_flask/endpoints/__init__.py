@@ -1,15 +1,26 @@
 import flask; from flask import request
+from flask_login import LoginManager
 import random
 
+
 from . import common
+from . import image_endpoint
+from . import profile_endpoint
 from . import recipe_endpoint
 
 site = common.site
+loginmanager = LoginManager(site)
 
 
 @site.route('/')
 def root():
     return flask.render_template('root.html')
+
+
+@site.route('/img/<imgid>')
+def get_img(imgid):
+    img = common.rdb.get_image(imgid)
+    return flask.send_file(img.file_path)
 
 
 @site.route('/favicon.ico')
