@@ -29,7 +29,7 @@ def post_login():
     if not success:
         flask.abort(403)
 
-    response = jsonify.make_json_response({})
+    response = jsonify.make_json_response({'username': user.username})
     cookie_value = recipedb.helpers.random_hex(length=32)
     response.set_cookie(
         COOKIE_NAME,
@@ -55,7 +55,7 @@ def post_register():
 
     common.rdb.new_user(username=username, password=password, display_name=displayname, bio_text=None, profile_image=None)
 
-    response = jsonify.make_json_response({})
+    response = jsonify.make_json_response({'username': user.username})
 
     cookie_value = recipedb.helpers.random_hex(length=32)
     response.set_cookie(
