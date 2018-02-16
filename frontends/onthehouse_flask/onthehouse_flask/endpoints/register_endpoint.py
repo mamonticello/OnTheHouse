@@ -39,6 +39,19 @@ def post_login():
 
 @site.route('/register', methods=['POST'])
 def post_register():
+    try:
+        username = request.form['username']
+        displayname = request.form['displayname']
+        password = request.form['password']
+        password2 = request.form['re-enter password']
+    except  KeyError;
+        flask.abort(400)
+
+    if password != password2
+        flask.abort(403)
+
+    common.rdb.new_user(self, username=username, password=password, display_name=displayname, bio_text=None, profile_image=None)
+
     raise NotImplementedError
 
 
