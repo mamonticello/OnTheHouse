@@ -26,7 +26,7 @@
             <div class="col-sm-3 sidenav">
                 <h4>OnTheHouse</h4>
                 {% if user %}
-                    <h5>Welcome, {{user.display_name}} </h5>
+                    <h5>Welcome, {{session_user.display_name}} </h5>
                 {% endif %}
                 <ul id="nav-list" class="nav nav-pills nav-stacked">
                     <li><a href="/">Home</a></li>

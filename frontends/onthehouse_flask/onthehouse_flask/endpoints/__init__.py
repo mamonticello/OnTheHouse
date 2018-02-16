@@ -21,7 +21,7 @@ def root():
         user = get_user_from_cookie(cookie_check)
     else:
         user = None
-    return flask.render_template('root.html', user = user)
+    return flask.render_template('root.html', session_user = user)
 
 
 @site.route('/img/<imgid>')

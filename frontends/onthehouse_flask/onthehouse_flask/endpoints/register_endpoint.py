@@ -36,7 +36,7 @@ def post_login():
         value=cookie_value,
         max_age=COOKIE_MAX_AGE,
     )
-    new_user_cookie(cookie_value, user)
+    common.new_user_cookie(cookie_value, user)
 
     return response
 
@@ -63,7 +63,7 @@ def post_register():
         value=cookie_value,
         max_age=COOKIE_MAX_AGE,
     )
-    new_user_cookie(cookie_value, user)
+    common.new_user_cookie(cookie_value, user)
 
     return response
 
