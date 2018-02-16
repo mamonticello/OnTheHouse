@@ -50,7 +50,7 @@ def post_register():
     if password != password2 or username == "":
         flask.abort(403)
 
-    common.rdb.new_user(self, username=username, password=password, display_name=displayname, bio_text=None, profile_image=None)
+    common.rdb.new_user(username=username, password=password, display_name=displayname, bio_text=None, profile_image=None)
 
     response = jsonify.make_json_response({})
     response.set_cookie(
