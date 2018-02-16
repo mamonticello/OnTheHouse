@@ -1,47 +1,72 @@
 {% extends "root.html" %}
+{% block title %} Login {% endblock %}
 
-{% block content %}
-
-<body>
-    <h1>register</h1>
-    <form action="/register" method=post>
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
-            {% for error in form.username.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.displayname.label }}<br>
-            {{ form.displayname(size=32) }}<br>
-            {% for error in form.displayname.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}<br>
-            {% for error in form.password.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password2.label }}<br>
-            {{ form.password2(size=32) }}<br>
-            {% for error in form.password2.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
-<body>
+{% block head %}
+    {{ super() }}
 
 {% endblock %}
 
+{% block body %}
+    <div class="row content">
+        <div class="col-sm-5">
+            <h1>Login</h1>
+            <input type="text" id="login-username" class="form-control" placeholder="Username">
+            <input type="password" id="login-password" class="form-control" placeholder="Password">
+            <button class="btn btn-default" type="button" onclick="submit_login()">Login</button>
+        </div>
+        <div class="col-sm-5">
+            <h1>Register</h1>
+            <input type="text" id="reg-username" class="form-control" placeholder="Username (for logging in)">
+            <input type="text" id="reg-displayname" class="form-control" placeholder="Display Name (appears on your profile)">
+            <input type="password" id="reg-password1" class="form-control" placeholder="Password">
+            <input type="password" id="reg-password2" class="form-control" placeholder="Re-enter Password">
+            <button class="btn btn-default" type="button" onclick="submit_register()">Register</button>
+        </div>
+    </div>
 
+    <script>
+    function submit_login()
+    {
+        var username = document.getElementById("login-username").value;
+        var password = document.getElementById("login-password").value;
+        var data = new FormData();
 
+        data.append("username", username);
+        data.append("password", password);
+        var url = "/login";
+        return post(url, data, receive_callback);
+    }
 
+    function submit_register()
+    {
+        var username = document.getElementById("reg-username").value;
+        var displayname = document.getElementById("reg-displayname").value;
+        var password1 = document.getElementById("reg-password1").value;
+        var password2 = document.getElementById("reg-password2").value;
+        var data = new FormData();
+        if (displayname == "")
+        {
+            displayname = username;
+        }
+        data.append("username", username);
+        data.append("displayname", displayname);
+        data.append("password", password1);
+        data.append("re-enter password", password2);
+        var url = "/register";
+        return post(url, data, receive_callback);
+    }
 
+    function receive_callback(response)
+    {
+        if ("error_type" in response)
+        {
+        }
+        else
+        {
+            window.location.href = "/";
+        }
+    }
+    </script>
+{% endblock %}
 
+{% block footer %} {{ super() }} {% endblock %}
