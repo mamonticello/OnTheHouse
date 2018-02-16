@@ -44,7 +44,7 @@ def post_register():
         displayname = request.form['displayname']
         password = request.form['password']
         password2 = request.form['re-enter password']
-    except  KeyError;
+    except KeyError:
         flask.abort(400)
 
     if password != password2 or username == "":
@@ -58,6 +58,8 @@ def post_register():
         value=recipedb.helpers.random_hex(length=32),
         max_age=COOKIE_MAX_AGE,
     )
+
+    return response
 
 
 
