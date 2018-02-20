@@ -569,6 +569,44 @@ class RecipeDB:
         self.log.debug('Created user %s with ID %s', user.username, user.id)
         return user
 
+    def _get_ingredient_or_tag(self, name):
+        try:
+            return self.get_ingredient(name=name)
+        except exceptions.NoSuchIngredient:
+            pass
+
+        try:
+            return self.get_ingredient_tag(name=name)
+        except exceptions.NoSuchIngredientTag:
+            pass
+
+        return None
+
+    def _normalize_ingredient_set(self, ingredients):
+        '''
+        When the user searches for a recipe, they might be providing us with
+        a variety of data.
+        '''
+        if ingredients is None:
+            return None
+
+        elif not ingredients:
+            return set()
+
+        if isinstance(ingredients, str):
+            ingredients = [i.strip() for i in ingredients.split(',')]
+            ingredients = [i for i in ingredients if i]
+
+        final_ingredients = set()
+        for ingredient in ingredients:
+            if isinstance(ingredient, str):
+                ingredient = self._get_ingredient_or_tag(name=ingredient)
+                if ingredient is not None:
+                    final_ingredients.add(ingredient.name)
+            if isinstance(ingredient, (objects.Ingredient, objects.IngredientTag)):
+                final_ingredients.add(ingredient.name)
+        return final_ingredients
+
     def search(
             self,
             *,
@@ -582,10 +620,6 @@ class RecipeDB:
             name=None,
             strict_ingredients=False,
         ):
-        '''
-        '''
-        cur = self.sql.cursor()
-
         wheres = []
         bindings = []
 
@@ -601,15 +635,8 @@ class RecipeDB:
             wheres.append('Cuisine = ?')
             bindings.append(cuisine)
 
-        if ingredients is None:
-            ingredients = set()
-        else:
-            ingredients = set(ingredients)
-
-        if ingredients_exclude is None:
-            ingredients_exclude = set()
-        else:
-            ingredients_exclude = set(ingredients_exclude)
+        ingredients = self._normalize_ingredient_set(ingredients)
+        ingredients_exclude = self._normalize_ingredient_set(ingredients_exclude)
 
         if meal_type is not None:
             wheres.append('MealType = ?')
@@ -625,6 +652,7 @@ class RecipeDB:
         else:
             wheres = ''
 
+        cur = self.sql.cursor()
         query = 'SELECT * FROM Recipe {wheres}'
         query = query.format(wheres=wheres)
         self.log.debug("%s %s", query, bindings)
@@ -635,24 +663,27 @@ class RecipeDB:
             recipe_row = cur.fetchone()
             if recipe_row is None:
                 break
+
             recipe = objects.Recipe(self, recipe_row)
+            recipe_ingredients = recipe.get_ingredients_and_tags()
+            recipe_ingredients = {i.name for i in recipe_ingredients}
 
-            recipe_ingredients = {qi.ingredient for qi in recipe.get_ingredients()}
+            if ingredients_exclude is not None:
+                if recipe_ingredients.intersection(ingredients_exclude):
+                    continue
 
-            if recipe_ingredients.intersection(ingredients_exclude):
-                continue
-
-            if ingredients:
+            if ingredients is not None:
                 matches = recipe_ingredients.intersection(ingredients)
 
                 if not matches:
                     continue
 
-                if strict_ingredients and matches != ingredients:
-                    # Recipe must contain all of our search.
+                matched_all = matches == ingredients
+                if strict_ingredients and not matched_all:
                     continue
 
                 match_counts[recipe] = len(matches)
+
             else:
                 match_counts[recipe] = 1
 

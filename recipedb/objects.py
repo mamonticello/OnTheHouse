@@ -68,15 +68,10 @@ class Ingredient(ObjectBase):
         self.recipedb.sql.commit()
 
     def add_tag(self, tag):
-        cur = self.recipedb.sql.cursor()
-        cur.execute(
-            'SELECT * FROM Ingredient_IngredientTag_Map WHERE IngredientID = ? AND IngredientTagID = ?',
-            [self.id, tag.id]
-        )
-        exists = cur.fetchone()
-        if exists is not None:
+        if self.has_tag(tag):
             return
 
+        cur = self.recipedb.sql.cursor()
         data = {
             'IngredientID': self.id,
             'IngredientTagID': tag.id,
@@ -93,6 +88,15 @@ class Ingredient(ObjectBase):
         tags = {self.recipedb.get_ingredient_tag_by_id(line[0]) for line in lines}
 
         return tags
+
+    def has_tag(self, tag):
+        cur = self.recipedb.sql.cursor()
+        cur.execute(
+            'SELECT * FROM Ingredient_IngredientTag_Map WHERE IngredientID = ? AND IngredientTagID = ?',
+            [self.id, tag.id]
+        )
+        exists = cur.fetchone()
+        return bool(exists)
 
     def remove_tag(self, tag):
         cur = self.recipedb.sql.cursor()
