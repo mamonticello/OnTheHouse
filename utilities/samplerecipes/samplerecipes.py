@@ -37,6 +37,21 @@ anonymous = rdb.new_user(
     profile_image=None,
 )
 
+ingredient_tags = {
+    'dairy': [
+        'milk',
+        'cheese',
+        'whipping cream',
+        'butter',
+    ]
+}
+
+for (tag_name, ingredient_names) in ingredient_tags.items():
+    tag = rdb.get_or_create_ingredient_tag(name=tag_name)
+    for ingredient_name in ingredient_names:
+        ingredient = rdb.get_or_create_ingredient(name=ingredient_name)
+        ingredient.add_tag(tag)
+
 # 1
 instructions = '''
 Soften cream cheese and Brie cheese.

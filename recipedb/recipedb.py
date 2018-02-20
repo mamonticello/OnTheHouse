@@ -191,6 +191,12 @@ class RecipeDB:
         except exceptions.NoSuchIngredient:
             return self.new_ingredient(name)
 
+    def get_or_create_ingredient_tag(self, name):
+        try:
+            return self.get_ingredient_tag(name=name)
+        except exceptions.NoSuchIngredientTag:
+            return self.new_ingredient_tag(name)
+
     def get_ingredient(self, *, id=None, name=None):
         '''
         Fetch a single Ingredient by its ID or name.
