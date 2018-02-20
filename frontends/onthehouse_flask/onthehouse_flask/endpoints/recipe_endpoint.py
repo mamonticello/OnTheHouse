@@ -7,23 +7,6 @@ from . import common
 site = common.site
 
 
-def normalize_ingredients(text):
-    if text is None:
-        return None
-
-    ingredients = text.split(',')
-    ingredients = [ingredient.strip() for ingredient in ingredients]
-    ingredients = [ingredient for ingredient in ingredients if ingredient != '']
-    final_ingredients = []
-    for ingredient in ingredients:
-        try:
-            final_ingredients.append(common.rdb.get_ingredient(name=ingredient))
-        except recipedb.exceptions.NoSuchIngredient:
-            pass
-
-    return final_ingredients
-
-
 @site.route('/recipe/<recipeid>')
 @site.route('/recipe/<recipeid>/<slug>')
 def get_recipe(recipeid, slug=None):
